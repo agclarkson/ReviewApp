@@ -10,10 +10,10 @@ This application implements the Community Rugby Referee Development Framework (C
 
 Licensed under MIT License
 
-Version: 2.0.2-phase2
+Version: 2.0.3-phase3
 """
 
-__version__ = "2.0.2-phase2"
+__version__ = "2.0.3-phase3"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
@@ -282,6 +282,10 @@ class CRRDFReviewApp:
         self.current_pillar = None
         self.current_question = 0
         
+        # Set up reviews directory
+        self.reviews_dir = Path.home() / "Documents" / "RugbyRefereeReviews"
+        self.reviews_dir.mkdir(parents=True, exist_ok=True)
+        
         # Apply modern theme if available
         if THEME_AVAILABLE:
             style = ttk.Style("cosmo")  # Modern, professional theme
@@ -294,6 +298,69 @@ class CRRDFReviewApp:
         
         # Create main container
         self.create_widgets()
+    
+    def get_review_filename(self, referee_name, date):
+        """Generate standardized filename for review"""
+        # Sanitize filename
+        safe_name = "".join(c for c in referee_name if c.isalnum() or c in (' ', '-', '_')).strip()
+        if not safe_name:
+            safe_name = "Unknown"
+        return self.reviews_dir / f"Review_{safe_name}_{date}.json"
+    
+    def save_review_json(self):
+        """Save current review to JSON file"""
+        try:
+            # Compile all review data
+            review_data = {
+                "version": __version__,
+                "saved_at": datetime.now().isoformat(),
+                "metadata": self.session.metadata,
+                "goals": self.session.goals,
+                "difficulty": self.session.difficulty,
+                "reflections": self.session.reflections,
+                "crrdf_reflections": self.session.crrdf_reflections if hasattr(self.session, 'crrdf_reflections') else {},
+                "gfa_scores": self.session.gfa_scores,
+                "coach_feedback": self.session.coach_feedback
+            }
+            
+            # Generate filename
+            filename = self.get_review_filename(
+                self.session.metadata.get('referee', 'Unknown'),
+                self.session.metadata.get('date', datetime.now().strftime("%Y-%m-%d"))
+            )
+            
+            # Save to JSON
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(review_data, f, indent=2, ensure_ascii=False)
+            
+            return filename
+        except Exception as e:
+            print(f"Failed to save JSON: {e}")
+            return None
+    
+    def load_review_json(self, filename):
+        """Load review from JSON file"""
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                review_data = json.load(f)
+            
+            # Load into session
+            self.session = ReviewSession()
+            self.session.metadata = review_data.get('metadata', {})
+            self.session.goals = review_data.get('goals', {})
+            self.session.difficulty = review_data.get('difficulty', 5)
+            self.session.reflections = review_data.get('reflections', {})
+            self.session.crrdf_reflections = review_data.get('crrdf_reflections', {})
+            self.session.gfa_scores = review_data.get('gfa_scores', {})
+            self.session.coach_feedback = review_data.get('coach_feedback', "")
+            
+            # Also populate pillar_answers for display
+            self.pillar_answers = review_data.get('crrdf_reflections', {}).copy()
+            
+            return True
+        except Exception as e:
+            messagebox.showerror("Load Error", f"Failed to load review:\n{str(e)}")
+            return False
     
     def center_window(self):
         """Center the window on screen"""
@@ -313,6 +380,8 @@ class CRRDFReviewApp:
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="New Review", command=self.new_review)
+        file_menu.add_command(label="Open Review...", command=self.open_review)
+        file_menu.add_command(label="Browse All Reviews...", command=self.browse_reviews)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
         
@@ -326,6 +395,167 @@ class CRRDFReviewApp:
         if messagebox.askyesno("New Review", "Start a new review? Any unsaved data will be lost."):
             self.session = ReviewSession()
             self.show_metadata_entry()
+    
+    def open_review(self):
+        """Open an existing review"""
+        filename = filedialog.askopenfilename(
+            title="Open Review",
+            initialdir=self.reviews_dir,
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+        )
+        
+        if filename and self.load_review_json(filename):
+            self.clear_content()  # Explicitly clear before loading
+            messagebox.showinfo("Success", "Review loaded successfully!")
+            self.show_metadata_entry()
+    
+    def browse_reviews(self):
+        """Show review browser dialog"""
+        browser = tk.Toplevel(self.root)
+        browser.title("Browse Reviews")
+        browser.geometry("800x600")
+        browser.transient(self.root)
+        
+        # Center the dialog
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 400
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 300
+        browser.geometry(f"800x600+{x}+{y}")
+        
+        # Header
+        header = tk.Frame(browser, bg="#1976D2", height=60)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="Review History", 
+                font=("Segoe UI", 16, "bold"), bg="#1976D2", fg="white").pack(pady=15)
+        
+        # Main content
+        content = tk.Frame(browser, bg="white")
+        content.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        # Search frame
+        search_frame = tk.Frame(content, bg="white")
+        search_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        tk.Label(search_frame, text="Search:", font=("Segoe UI", 10), bg="white").pack(side=tk.LEFT, padx=(0, 5))
+        search_var = tk.StringVar()
+        search_entry = tk.Entry(search_frame, textvariable=search_var, font=("Segoe UI", 10), width=30)
+        search_entry.pack(side=tk.LEFT, padx=(0, 10))
+        
+        def update_list(*args):
+            populate_list(search_var.get())
+        
+        search_var.trace_add('write', update_list)
+        
+        tk.Button(search_frame, text="Refresh", command=lambda: populate_list(search_var.get()),
+                 font=("Segoe UI", 9), bg="#E0E0E0", fg="#212121",
+                 padx=10, pady=5, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT)
+        
+        # Listbox with scrollbar
+        list_frame = tk.Frame(content, bg="white")
+        list_frame.pack(fill=tk.BOTH, expand=True)
+        
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        listbox = tk.Listbox(list_frame, font=("Segoe UI", 10), yscrollcommand=scrollbar.set)
+        listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=listbox.yview)
+        
+        # Store file paths
+        review_files = []
+        
+        def populate_list(search_term=""):
+            """Populate listbox with reviews"""
+            nonlocal review_files
+            listbox.delete(0, tk.END)
+            review_files = []
+            
+            # Get all JSON files
+            try:
+                json_files = sorted(self.reviews_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+            except:
+                json_files = []
+            
+            for filepath in json_files:
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    
+                    referee = data.get('metadata', {}).get('referee', 'Unknown')
+                    date = data.get('metadata', {}).get('date', 'Unknown')
+                    game = data.get('metadata', {}).get('game_grade', 'Unknown')
+                    
+                    # Apply search filter
+                    if search_term:
+                        search_lower = search_term.lower()
+                        if not (search_lower in referee.lower() or 
+                               search_lower in date.lower() or 
+                               search_lower in game.lower()):
+                            continue
+                    
+                    display_text = f"{date} - {referee} - {game}"
+                    listbox.insert(tk.END, display_text)
+                    review_files.append(filepath)
+                except:
+                    pass
+            
+            if listbox.size() == 0:
+                listbox.insert(tk.END, "No reviews found")
+        
+        def load_selected():
+            """Load selected review"""
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("No Selection", "Please select a review to load")
+                return
+            
+            idx = selection[0]
+            if idx < len(review_files):
+                if self.load_review_json(review_files[idx]):
+                    browser.destroy()
+                    self.clear_content()  # Explicitly clear before loading
+                    messagebox.showinfo("Success", "Review loaded successfully!")
+                    self.show_metadata_entry()
+        
+        def delete_selected():
+            """Delete selected review"""
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("No Selection", "Please select a review to delete")
+                return
+            
+            idx = selection[0]
+            if idx < len(review_files):
+                if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this review?"):
+                    try:
+                        review_files[idx].unlink()
+                        populate_list(search_var.get())
+                        messagebox.showinfo("Deleted", "Review deleted successfully")
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to delete:\n{str(e)}")
+        
+        # Buttons
+        button_frame = tk.Frame(content, bg="white")
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        tk.Button(button_frame, text="Load", command=load_selected,
+                 font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
+                 padx=20, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=(0, 5))
+        
+        tk.Button(button_frame, text="Delete", command=delete_selected,
+                 font=("Segoe UI", 10), bg="#F44336", fg="white",
+                 padx=20, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
+        tk.Button(button_frame, text="Close", command=browser.destroy,
+                 font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                 padx=20, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.RIGHT)
+        
+        # Populate initially
+        populate_list()
+        
+        # Double-click to load
+        listbox.bind('<Double-Button-1>', lambda e: load_selected())
     
     def show_about_dialog(self):
         """Show the About dialog"""
@@ -457,6 +687,12 @@ class CRRDFReviewApp:
             entry = PlaceholderEntry(container, placeholder=placeholder, width=40, font=("Segoe UI", 10))
             entry.pack(side=tk.LEFT, padx=5)
             self.metadata_entries[key] = entry
+            
+            # Populate with loaded data if it exists
+            if self.session.metadata.get(key):
+                entry.delete(0, tk.END)
+                entry.insert(0, self.session.metadata[key])
+                entry.config(fg=entry.default_fg_color)  # Not placeholder color
         
         # Goals section
         tk.Label(frame, text="\nMatch Goals", font=("Segoe UI", 14, "bold"),
@@ -468,20 +704,32 @@ class CRRDFReviewApp:
                                            height=2, width=60, font=("Segoe UI", 10), wrap=tk.WORD)
         self.primary_goal.pack(padx=20, pady=5)
         
+        # Populate with loaded data
+        if self.session.goals.get('primary'):
+            self.primary_goal.delete("1.0", tk.END)
+            self.primary_goal.insert("1.0", self.session.goals['primary'])
+            self.primary_goal.config(fg=self.primary_goal.default_fg_color)
+        
         tk.Label(frame, text="Secondary Goal:", anchor="w", bg="#FAFAFA",
                 font=("Segoe UI", 10, "bold"), fg="#212121").pack(fill=tk.X, padx=20)
         self.secondary_goal = PlaceholderText(frame, placeholder="Your secondary focus area? e.g., 'Better positioning at scrum time'", 
                                              height=2, width=60, font=("Segoe UI", 10), wrap=tk.WORD)
         self.secondary_goal.pack(padx=20, pady=5)
         
+        # Populate with loaded data
+        if self.session.goals.get('secondary'):
+            self.secondary_goal.delete("1.0", tk.END)
+            self.secondary_goal.insert("1.0", self.session.goals['secondary'])
+            self.secondary_goal.config(fg=self.secondary_goal.default_fg_color)
+        
         # Difficulty scale
         tk.Label(frame, text="\nGame Difficulty (1=Easy, 10=Very Hard):",
                 bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(pady=10)
         
-        self.difficulty_var = tk.IntVar(value=5)
+        self.difficulty_var = tk.IntVar(value=self.session.difficulty)
         
         # Display current value
-        difficulty_value_label = tk.Label(frame, text="Current: 5", 
+        difficulty_value_label = tk.Label(frame, text=f"Current: {self.session.difficulty}", 
                                          font=("Segoe UI", 10), bg="#FAFAFA", fg="#1976D2")
         difficulty_value_label.pack()
         
@@ -561,6 +809,12 @@ class CRRDFReviewApp:
                                   font=("Segoe UI", 10), wrap=tk.WORD)
             text.pack(padx=20, pady=5)
             self.reflection_entries[key] = text
+            
+            # Populate with loaded data
+            if self.session.reflections.get(key):
+                text.delete("1.0", tk.END)
+                text.insert("1.0", self.session.reflections[key])
+                text.config(fg=text.default_fg_color)
         
         # Navigation
         nav = tk.Frame(frame, bg="#FAFAFA")
@@ -829,7 +1083,10 @@ class CRRDFReviewApp:
         for key, var in self.gfa_vars.items():
             self.session.gfa_scores[key] = var.get()
         
-        # Ask for save location
+        # Auto-save JSON first
+        json_filename = self.save_review_json()
+        
+        # Ask for Excel save location
         filename = filedialog.asksaveasfilename(
             defaultextension=".xlsx",
             filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")],
@@ -837,11 +1094,17 @@ class CRRDFReviewApp:
         )
         
         if not filename:
+            # Still saved JSON even if they cancel Excel
+            if json_filename:
+                messagebox.showinfo("Saved", f"Review saved to:\n{json_filename}")
             return
         
         try:
             self._create_excel_export(filename)
-            messagebox.showinfo("Success", f"Review exported successfully to:\n{filename}")
+            if json_filename:
+                messagebox.showinfo("Success", f"Review exported successfully!\n\nExcel: {filename}\nJSON: {json_filename}")
+            else:
+                messagebox.showinfo("Success", f"Review exported successfully to:\n{filename}")
         except Exception as e:
             messagebox.showerror("Export Error", f"Failed to export:\n{str(e)}")
     
