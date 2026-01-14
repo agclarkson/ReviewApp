@@ -44,7 +44,7 @@ jobs:
       - name: Build executable with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --name="Rugby Referee Review" --icon=NONE referee_review_app.py
+          pyinstaller --onefile --windowed --name="Rugby Referee Review" --icon=NONE --version-file=version_info.txt --noupx referee_review_app.py
           mkdir release
           copy dist\\"Rugby Referee Review.exe" release\\
           copy README.md release\\
@@ -53,7 +53,7 @@ jobs:
       - name: Build executable with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller --onefile --windowed --name="Rugby Referee Review" referee_review_app.py
+          pyinstaller --onefile --windowed --name="Rugby Referee Review" --noupx referee_review_app.py
           mkdir release
           cp "dist/Rugby Referee Review" release/
           cp README.md release/
@@ -62,7 +62,7 @@ jobs:
       - name: Build executable with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --onefile --windowed --name="rugby-referee-review" referee_review_app.py
+          pyinstaller --onefile --windowed --name="rugby-referee-review" --noupx referee_review_app.py
           mkdir release
           cp dist/rugby-referee-review release/
           cp README.md release/
@@ -110,9 +110,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
         run: |
-          gh release create "$TAG_NAME" \
-            --title "Rugby Referee Review $TAG_NAME" \
-            --notes "Download the version for your operating system. See README.md for installation instructions." \
-            rugby-referee-review-windows/rugby-referee-review-windows.zip \
-            rugby-referee-review-macos/rugby-referee-review-macos.zip \
-            rugby-referee-review-linux/rugby-referee-review-linux.tar.gz
+          # Check if RELEASE_NOTES.md exists, otherwise use default
+          if [ -f "RELEASE_NOTES.md" ]; then
+            NOTES_FILE="RELEASE_NOTES.md"
+          else
+            NOTES_FILE=""
+          fi
+          
+          if [ -n "$NOTES_FILE" ]; then
+            gh release create "$TAG_NAME" \
+              --title "Rugby Referee Review $TAG_NAME" \
+              --notes-file "$NOTES_FILE" \
+              rugby-referee-review-windows/rugby-referee-review-windows.zip \
+              rugby-referee-review-macos/rugby-referee-review-macos.zip \
+              rugby-referee-review-linux/rugby-referee-review-linux.tar.gz
+          else
+            gh release create "$TAG_NAME" \
+              --title "Rugby Referee Review $TAG_NAME" \
+              --notes "Download the version for your operating system. See README.md for installation instructions." \
+              rugby-referee-review-windows/rugby-referee-review-windows.zip \
+              rugby-referee-review-macos/rugby-referee-review-macos.zip \
+              rugby-referee-review-linux/rugby-referee-review-linux.tar.gz
+          fi

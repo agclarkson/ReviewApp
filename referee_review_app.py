@@ -10,10 +10,10 @@ This application implements the Community Rugby Referee Development Framework (C
 
 Licensed under MIT License
 
-Version: 2.0.4-phase4
+Version: 2.0.6-phase5
 """
 
-__version__ = "2.0.4-phase4"
+__version__ = "2.0.6-phase5"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
@@ -23,22 +23,18 @@ CRRDF_VERSION = "February 2025"
 
 # Common Rugby Game Grades
 GAME_GRADES = [
-    "Premier 1",
-    "Premier 2",
-    "Premier 3",
-    "Senior 1",
-    "Senior 2",
-    "Senior 3",
-    "Colts",
-    "U19",
-    "U18",
-    "U16",
-    "U14",
-    "Women's Premier",
+    "Division 1",
+    "Southern Premier",
+    "Central Premier",
     "Women's Division 1",
+    "Premier 1st XV",
+    "Division 2",
+    "Division 3",
+    "U20 Colts",
+    "U21 Colts Division 1",
+    "U21 Colts Division 2",
     "Women's Division 2",
-    "Development",
-    "Club Rugby",
+    "High School",
     "Other"
 ]
 
@@ -312,6 +308,15 @@ class CRRDFReviewApp:
         self.reviews_dir = Path.home() / "Documents" / "RugbyRefereeReviews"
         self.reviews_dir.mkdir(parents=True, exist_ok=True)
         
+        # Set up config file
+        self.config_file = Path.home() / ".rugby_referee_review_config.json"
+        self.config = self.load_config()
+        
+        # Check if first run
+        if self.config.get('first_run', True):
+            self.show_welcome_screen()
+            return  # Don't continue with normal UI until welcome is done
+        
         # Apply modern theme if available
         if THEME_AVAILABLE:
             style = ttk.Style("cosmo")  # Modern, professional theme
@@ -332,6 +337,127 @@ class CRRDFReviewApp:
         if not safe_name:
             safe_name = "Unknown"
         return self.reviews_dir / f"Review_{safe_name}_{date}.json"
+    
+    def load_config(self):
+        """Load configuration from file"""
+        try:
+            if self.config_file.exists():
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except:
+            pass
+        return {"first_run": True}
+    
+    def save_config(self):
+        """Save configuration to file"""
+        try:
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(self.config, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Failed to save config: {e}")
+    
+    def show_welcome_screen(self):
+        """Show first-run welcome and setup screen"""
+        # Clear any existing content
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Create welcome screen
+        welcome = tk.Frame(self.root, bg="white")
+        welcome.pack(fill=tk.BOTH, expand=True)
+        
+        # Header
+        header = tk.Frame(welcome, bg="#1976D2", height=100)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="Welcome to", 
+                font=("Segoe UI", 14), bg="#1976D2", fg="#E3F2FD").pack(pady=(20, 0))
+        tk.Label(header, text="Rugby Referee Review System", 
+                font=("Segoe UI", 24, "bold"), bg="#1976D2", fg="white").pack(pady=(5, 20))
+        
+        # Content
+        content = tk.Frame(welcome, bg="white")
+        content.pack(fill=tk.BOTH, expand=True, padx=50, pady=40)
+        
+        tk.Label(content, text="Let's personalize your experience", 
+                font=("Segoe UI", 16, "bold"), bg="white", fg="#212121").pack(pady=(0, 10))
+        
+        tk.Label(content, text="This information will be used to auto-fill your review forms.", 
+                font=("Segoe UI", 10), bg="white", fg="#757575").pack(pady=(0, 30))
+        
+        # Name field
+        name_frame = tk.Frame(content, bg="white")
+        name_frame.pack(fill=tk.X, pady=10)
+        
+        tk.Label(name_frame, text="Your Full Name:", 
+                font=("Segoe UI", 11, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        tk.Label(name_frame, text="This will auto-fill the 'Referee' field in your reviews", 
+                font=("Segoe UI", 9), bg="white", fg="#757575", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        name_entry = tk.Entry(name_frame, font=("Segoe UI", 12), width=40)
+        name_entry.pack(fill=tk.X, pady=5)
+        name_entry.focus()
+        
+        # Coach field
+        coach_frame = tk.Frame(content, bg="white")
+        coach_frame.pack(fill=tk.X, pady=20)
+        
+        tk.Label(coach_frame, text="Preferred Coach Name (Optional):", 
+                font=("Segoe UI", 11, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        tk.Label(coach_frame, text="This will auto-fill the 'Coach' field in your reviews", 
+                font=("Segoe UI", 9), bg="white", fg="#757575", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        coach_entry = tk.Entry(coach_frame, font=("Segoe UI", 12), width=40)
+        coach_entry.pack(fill=tk.X, pady=5)
+        
+        # Error label
+        error_label = tk.Label(content, text="", font=("Segoe UI", 10), 
+                              bg="white", fg="#F44336")
+        error_label.pack(pady=10)
+        
+        def complete_setup():
+            """Save settings and continue"""
+            name = name_entry.get().strip()
+            
+            if not name:
+                error_label.config(text="Please enter your name")
+                return
+            
+            coach = coach_entry.get().strip()
+            
+            # Save config
+            self.config = {
+                "first_run": False,
+                "user_name": name,
+                "coach_name": coach
+            }
+            self.save_config()
+            
+            # Clear welcome screen
+            welcome.destroy()
+            
+            # Initialize normal UI
+            if THEME_AVAILABLE:
+                style = ttk.Style("cosmo")
+            else:
+                style = ttk.Style()
+                style.theme_use('clam')
+            
+            self.create_menu_bar()
+            self.create_widgets()
+        
+        # Buttons
+        button_frame = tk.Frame(content, bg="white")
+        button_frame.pack(pady=30)
+        
+        tk.Button(button_frame, text="Get Started", command=complete_setup,
+                 font=("Segoe UI", 12, "bold"), bg="#4CAF50", fg="white",
+                 padx=40, pady=12, relief=tk.FLAT, cursor="hand2").pack()
+        
+        # Bind Enter key
+        name_entry.bind('<Return>', lambda e: complete_setup())
+        coach_entry.bind('<Return>', lambda e: complete_setup())
     
     def save_review_json(self):
         """Save current review to JSON file"""
@@ -412,6 +538,11 @@ class CRRDFReviewApp:
         file_menu.add_command(label="View Analytics", command=self.show_analytics_dashboard)
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
+        
+        # Settings menu
+        settings_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Settings", menu=settings_menu)
+        settings_menu.add_command(label="Personal Info", command=self.show_personal_settings)
         
         # Help menu
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -833,6 +964,87 @@ class CRRDFReviewApp:
                  font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
                  padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=20)
     
+    def show_personal_settings(self):
+        """Show personal settings dialog"""
+        settings = tk.Toplevel(self.root)
+        settings.title("Personal Settings")
+        settings.geometry("550x400")
+        settings.resizable(False, False)
+        
+        # Center the dialog
+        settings.transient(self.root)
+        settings.grab_set()
+        
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 275
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 200
+        settings.geometry(f"550x400+{x}+{y}")
+        
+        # Header
+        header = tk.Frame(settings, bg="#1976D2", height=60)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="Personal Information", 
+                font=("Segoe UI", 16, "bold"), bg="#1976D2", fg="white").pack(pady=15)
+        
+        # Content
+        content = tk.Frame(settings, bg="white")
+        content.pack(fill=tk.BOTH, expand=True, padx=40, pady=20)
+        
+        tk.Label(content, text="This information auto-fills your review forms", 
+                font=("Segoe UI", 9), bg="white", fg="#757575").pack(pady=(0, 20))
+        
+        # Name field
+        tk.Label(content, text="Your Full Name:", 
+                font=("Segoe UI", 10, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        name_entry = tk.Entry(content, font=("Segoe UI", 11), width=40, relief=tk.SOLID, bd=1)
+        name_entry.pack(fill=tk.X, pady=(0, 15), ipady=5)
+        name_entry.insert(0, self.config.get("user_name", ""))
+        
+        # Coach field
+        tk.Label(content, text="Preferred Coach Name (Optional):", 
+                font=("Segoe UI", 10, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        coach_entry = tk.Entry(content, font=("Segoe UI", 11), width=40, relief=tk.SOLID, bd=1)
+        coach_entry.pack(fill=tk.X, pady=(0, 15), ipady=5)
+        coach_entry.insert(0, self.config.get("coach_name", ""))
+        
+        # Status label
+        status_label = tk.Label(content, text="", font=("Segoe UI", 10), bg="white", height=2)
+        status_label.pack(pady=10)
+        
+        def save_settings():
+            """Save updated settings"""
+            name = name_entry.get().strip()
+            
+            if not name:
+                status_label.config(text="⚠ Name cannot be empty", fg="#F44336")
+                return
+            
+            coach = coach_entry.get().strip()
+            
+            self.config["user_name"] = name
+            self.config["coach_name"] = coach
+            self.save_config()
+            
+            status_label.config(text="✓ Settings saved successfully!", fg="#4CAF50")
+            self.root.after(1500, settings.destroy)
+        
+        # Buttons
+        button_frame = tk.Frame(content, bg="white")
+        button_frame.pack(pady=5)
+        
+        tk.Button(button_frame, text="Save Changes", command=save_settings,
+                 font=("Segoe UI", 10, "bold"), bg="#4CAF50", fg="white",
+                 padx=30, pady=10, relief=tk.FLAT, cursor="hand2",
+                 activebackground="#45a049").pack(side=tk.LEFT, padx=5)
+        
+        tk.Button(button_frame, text="Cancel", command=settings.destroy,
+                 font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                 padx=30, pady=10, relief=tk.FLAT, cursor="hand2",
+                 activebackground="#d0d0d0").pack(side=tk.LEFT, padx=5)
+    
     def create_widgets(self):
         """Create the main UI"""
         # Header with modern color
@@ -957,6 +1169,15 @@ class CRRDFReviewApp:
             if self.session.metadata.get(key):
                 entry.delete(0, tk.END)
                 entry.insert(0, self.session.metadata[key])
+                entry.config(fg=entry.default_fg_color)
+            # Otherwise auto-fill from config for new reviews
+            elif key == "referee" and self.config.get("user_name"):
+                entry.delete(0, tk.END)
+                entry.insert(0, self.config.get("user_name"))
+                entry.config(fg=entry.default_fg_color)
+            elif key == "coach" and self.config.get("coach_name"):
+                entry.delete(0, tk.END)
+                entry.insert(0, self.config.get("coach_name"))
                 entry.config(fg=entry.default_fg_color)
         
         # Goals section
