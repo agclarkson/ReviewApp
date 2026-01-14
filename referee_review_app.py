@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
-NZ Rugby Referee Review System
+Rugby Referee Review System
 Professional review application based on CRRDF framework
 
 Copyright © 2025 Andrew Clarkson
 All Rights Reserved
 
-This application implements the Community Rugby Referee Development Framework (CRRDF)
-published by New Zealand Rugby (February 2025).
+This application implements the Community Rugby Referee Development Framework (CRRDF).
 
 Licensed under MIT License
 
-Version: 2.0.0-phase1
+Version: 2.0.2-phase2
 """
 
-__version__ = "2.0.0-phase1"
+__version__ = "2.0.2-phase2"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
+
+# Application Constants
+CRRDF_VERSION = "February 2025"
 
 import tkinter as tk
 from tkinter import messagebox, filedialog
@@ -270,6 +272,9 @@ class CRRDFReviewApp:
         # Start with a good default size
         self.root.geometry("1100x750")
         
+        # Center window on screen
+        self.center_window()
+        
         # Allow window to be resizable
         self.root.resizable(True, True)
         
@@ -278,6 +283,106 @@ class CRRDFReviewApp:
         self.current_question = 0
         
         # Apply modern theme if available
+        if THEME_AVAILABLE:
+            style = ttk.Style("cosmo")  # Modern, professional theme
+        else:
+            style = ttk.Style()
+            style.theme_use('clam')
+        
+        # Create menu bar
+        self.create_menu_bar()
+        
+        # Create main container
+        self.create_widgets()
+    
+    def center_window(self):
+        """Center the window on screen"""
+        self.root.update_idletasks()
+        width = 1100
+        height = 750
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+    
+    def create_menu_bar(self):
+        """Create the menu bar"""
+        menubar = tk.Menu(self.root)
+        self.root.config(menu=menubar)
+        
+        # File menu
+        file_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="New Review", command=self.new_review)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
+        
+        # Help menu
+        help_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="About", command=self.show_about_dialog)
+    
+    def new_review(self):
+        """Start a new review"""
+        if messagebox.askyesno("New Review", "Start a new review? Any unsaved data will be lost."):
+            self.session = ReviewSession()
+            self.show_metadata_entry()
+    
+    def show_about_dialog(self):
+        """Show the About dialog"""
+        about_window = tk.Toplevel(self.root)
+        about_window.title("About")
+        about_window.geometry("500x400")
+        about_window.resizable(False, False)
+        
+        # Center the dialog
+        about_window.transient(self.root)
+        about_window.grab_set()
+        
+        # Calculate position
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 250
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 200
+        about_window.geometry(f"500x400+{x}+{y}")
+        
+        # Header with color
+        header = tk.Frame(about_window, bg="#1976D2", height=80)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="Rugby Referee Review System", 
+                font=("Segoe UI", 18, "bold"), bg="#1976D2", fg="white").pack(pady=20)
+        
+        # Content
+        content = tk.Frame(about_window, bg="white")
+        content.pack(fill=tk.BOTH, expand=True, padx=30, pady=20)
+        
+        tk.Label(content, text=f"Version {__version__}", 
+                font=("Segoe UI", 11), bg="white", fg="#757575").pack(pady=5)
+        
+        tk.Label(content, text="", bg="white").pack(pady=5)  # Spacer
+        
+        tk.Label(content, text="Copyright © 2025 Andrew Clarkson", 
+                font=("Segoe UI", 11, "bold"), bg="white", fg="#212121").pack(pady=5)
+        
+        tk.Label(content, text="All Rights Reserved", 
+                font=("Segoe UI", 9), bg="white", fg="#757575").pack()
+        
+        tk.Label(content, text="", bg="white").pack(pady=10)  # Spacer
+        
+        tk.Label(content, text="Implements the Community Rugby Referee\nDevelopment Framework (CRRDF)", 
+                font=("Segoe UI", 10), bg="white", fg="#212121", justify=tk.CENTER).pack(pady=5)
+        
+        tk.Label(content, text=f"CRRDF Framework: {CRRDF_VERSION}", 
+                font=("Segoe UI", 9), bg="white", fg="#757575").pack(pady=2)
+        
+        tk.Label(content, text="", bg="white").pack(pady=10)  # Spacer
+        
+        tk.Label(content, text="Licensed under MIT License", 
+                font=("Segoe UI", 9), bg="white", fg="#757575").pack()
+        
+        # Close button
+        tk.Button(content, text="Close", command=about_window.destroy,
+                 font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
+                 padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=20)
         if THEME_AVAILABLE:
             style = ttk.Style("cosmo")  # Modern, professional theme
         else:
@@ -891,12 +996,76 @@ class CRRDFReviewApp:
             widget.destroy()
 
 
+def show_splash_screen(parent):
+    """Display splash screen while app loads"""
+    splash = tk.Toplevel(parent)
+    splash.title("")
+    splash.overrideredirect(True)  # Remove window decorations
+    
+    width = 500
+    height = 300
+    x = (splash.winfo_screenwidth() // 2) - (width // 2)
+    y = (splash.winfo_screenheight() // 2) - (height // 2)
+    splash.geometry(f'{width}x{height}+{x}+{y}')
+    
+    # Main frame
+    frame = tk.Frame(splash, bg="#1976D2", relief=tk.RAISED, borderwidth=2)
+    frame.pack(fill=tk.BOTH, expand=True)
+    
+    # App title
+    tk.Label(frame, text="Rugby Referee Review System", 
+            font=("Segoe UI", 20, "bold"), bg="#1976D2", fg="white").pack(pady=(40, 10))
+    
+    # Version
+    tk.Label(frame, text=f"Version {__version__}", 
+            font=("Segoe UI", 11), bg="#1976D2", fg="#E3F2FD").pack(pady=5)
+    
+    # Copyright
+    tk.Label(frame, text="", bg="#1976D2").pack(pady=10)  # Spacer
+    tk.Label(frame, text="Copyright © 2025 Andrew Clarkson", 
+            font=("Segoe UI", 10), bg="#1976D2", fg="white").pack(pady=5)
+    
+    # CRRDF
+    tk.Label(frame, text="Based on CRRDF Framework", 
+            font=("Segoe UI", 9, "italic"), bg="#1976D2", fg="#E3F2FD").pack(pady=2)
+    
+    # Loading message
+    tk.Label(frame, text="", bg="#1976D2").pack(pady=15)  # Spacer
+    loading_label = tk.Label(frame, text="Loading...", 
+            font=("Segoe UI", 10), bg="#1976D2", fg="#E3F2FD")
+    loading_label.pack(pady=10)
+    
+    # Progress bar
+    progress = ttk.Progressbar(frame, mode='indeterminate', length=300)
+    progress.pack(pady=10)
+    progress.start(10)
+    
+    splash.update()
+    return splash
+
+
 def main():
     """Main entry point"""
+    # Create main window first (hidden)
     if THEME_AVAILABLE:
         root = ttk.Window(themename="cosmo")
     else:
         root = tk.Tk()
+    
+    root.withdraw()  # Hide main window initially
+    
+    # Show splash screen
+    splash = show_splash_screen(root)
+    
+    # Simulate loading (in real app, this is where you'd load resources)
+    import time
+    for i in range(20):  # 2 seconds total
+        time.sleep(0.1)
+        splash.update()
+    
+    # Close splash and show main app
+    splash.destroy()
+    root.deiconify()  # Show main window
     
     app = CRRDFReviewApp(root)
     root.mainloop()
