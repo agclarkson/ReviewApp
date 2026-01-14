@@ -10,16 +10,32 @@ This application implements the Community Rugby Referee Development Framework (C
 
 Licensed under MIT License
 
-Version: 2.0.3-phase3
+Version: 2.0.4-phase4
 """
 
-__version__ = "2.0.3-phase3"
+__version__ = "2.0.4-phase4"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
 
 # Application Constants
 CRRDF_VERSION = "February 2025"
+
+# Common Rugby Game Grades
+GAME_GRADES = [
+    "Division 1",
+    "Southern Premier",
+    "Central Premier",
+    "Premier 1st XV",
+    "Division 2",
+    "Division 3",
+    "U20 Colts",
+    "U21 Colts Division 1",
+    "U21 Colts Division 2",
+    "Women's Division 1",
+    "Women's Division 2",
+    "High School"
+]
 
 import tkinter as tk
 from tkinter import messagebox, filedialog
@@ -38,6 +54,11 @@ from pathlib import Path
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from typing import Dict, List, Any
+import matplotlib
+matplotlib.use('TkAgg')  # Use Tk backend
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 # CRRDF Framework Questions Database
 CRRDF_QUESTIONS = {
@@ -383,6 +404,8 @@ class CRRDFReviewApp:
         file_menu.add_command(label="Open Review...", command=self.open_review)
         file_menu.add_command(label="Browse All Reviews...", command=self.browse_reviews)
         file_menu.add_separator()
+        file_menu.add_command(label="View Analytics", command=self.show_analytics_dashboard)
+        file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
         
         # Help menu
@@ -557,6 +580,197 @@ class CRRDFReviewApp:
         # Double-click to load
         listbox.bind('<Double-Button-1>', lambda e: load_selected())
     
+    def show_analytics_dashboard(self):
+        """Show analytics dashboard with charts and statistics"""
+        # Load all reviews
+        reviews = []
+        try:
+            json_files = sorted(self.reviews_dir.glob("*.json"), key=lambda p: p.stat().st_mtime)
+        except:
+            json_files = []
+        
+        for filepath in json_files:
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    reviews.append(data)
+            except:
+                pass
+        
+        if len(reviews) == 0:
+            messagebox.showinfo("No Data", "No reviews found. Complete some reviews first!")
+            return
+        
+        # Create dashboard window
+        dashboard = tk.Toplevel(self.root)
+        dashboard.title("Analytics Dashboard")
+        dashboard.geometry("1200x800")
+        dashboard.transient(self.root)
+        
+        # Center the dialog
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 600
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 400
+        dashboard.geometry(f"1200x800+{x}+{y}")
+        
+        # Header
+        header = tk.Frame(dashboard, bg="#1976D2", height=60)
+        header.pack(fill=tk.X)
+        header.pack_propagate(False)
+        
+        tk.Label(header, text="📊 Performance Analytics", 
+                font=("Segoe UI", 18, "bold"), bg="#1976D2", fg="white").pack(pady=15)
+        
+        # Create scrollable content
+        canvas = tk.Canvas(dashboard, bg="white", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(dashboard, orient="vertical", command=canvas.yview)
+        content = tk.Frame(canvas, bg="white")
+        
+        content.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=content, anchor="nw", width=1150)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Statistics Section
+        stats_frame = tk.Frame(content, bg="white")
+        stats_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        tk.Label(stats_frame, text="Overview Statistics", 
+                font=("Segoe UI", 16, "bold"), bg="white", fg="#1976D2").pack(anchor="w", pady=(0, 10))
+        
+        # Calculate stats
+        total_reviews = len(reviews)
+        dates = [r.get('metadata', {}).get('date', '') for r in reviews if r.get('metadata', {}).get('date')]
+        date_range = f"{min(dates)} to {max(dates)}" if dates else "N/A"
+        
+        grades = [r.get('metadata', {}).get('game_grade', '') for r in reviews if r.get('metadata', {}).get('game_grade')]
+        most_common = max(set(grades), key=grades.count) if grades else "N/A"
+        
+        avg_difficulty = sum([r.get('difficulty', 5) for r in reviews]) / len(reviews) if reviews else 0
+        
+        # Display stats in grid
+        stats_grid = tk.Frame(stats_frame, bg="white")
+        stats_grid.pack(fill=tk.X)
+        
+        stats_data = [
+            ("Total Reviews", str(total_reviews)),
+            ("Date Range", date_range),
+            ("Most Common Grade", most_common),
+            ("Avg Difficulty", f"{avg_difficulty:.1f}/10")
+        ]
+        
+        for i, (label, value) in enumerate(stats_data):
+            stat_box = tk.Frame(stats_grid, bg="#E3F2FD", relief=tk.RAISED, bd=1)
+            stat_box.grid(row=0, column=i, padx=5, pady=5, sticky="nsew")
+            stats_grid.columnconfigure(i, weight=1)
+            
+            tk.Label(stat_box, text=label, font=("Segoe UI", 9), 
+                    bg="#E3F2FD", fg="#757575").pack(pady=(10, 5))
+            tk.Label(stat_box, text=value, font=("Segoe UI", 14, "bold"), 
+                    bg="#E3F2FD", fg="#1976D2").pack(pady=(0, 10))
+        
+        # GFA Trends Chart
+        chart_frame = tk.Frame(content, bg="white")
+        chart_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        tk.Label(chart_frame, text="GFA Score Trends", 
+                font=("Segoe UI", 16, "bold"), bg="white", fg="#1976D2").pack(anchor="w", pady=(0, 10))
+        
+        # Calculate average GFA scores per review
+        review_dates = []
+        avg_scores = []
+        
+        for review in reviews:
+            date = review.get('metadata', {}).get('date', '')
+            if not date:
+                continue
+            
+            gfa_scores = review.get('gfa_scores', {})
+            if gfa_scores:
+                scores = [v for v in gfa_scores.values() if isinstance(v, (int, float))]
+                if scores:
+                    review_dates.append(date)
+                    avg_scores.append(sum(scores) / len(scores))
+        
+        if review_dates and avg_scores:
+            # Create matplotlib figure
+            fig = Figure(figsize=(10, 4), dpi=100, facecolor='white')
+            ax = fig.add_subplot(111)
+            
+            ax.plot(range(len(avg_scores)), avg_scores, marker='o', linewidth=2, 
+                   markersize=8, color='#1976D2', label='Average GFA Score')
+            ax.axhline(y=3, color='#FF9800', linestyle='--', label='Satisfactory (3.0)', alpha=0.7)
+            ax.axhline(y=4, color='#4CAF50', linestyle='--', label='Sound (4.0)', alpha=0.7)
+            
+            ax.set_xlabel('Review Number', fontsize=11)
+            ax.set_ylabel('Average Score', fontsize=11)
+            ax.set_ylim(1, 5)
+            ax.grid(True, alpha=0.3)
+            ax.legend(loc='lower right')
+            
+            # Embed in tkinter
+            canvas_widget = FigureCanvasTkAgg(fig, chart_frame)
+            canvas_widget.draw()
+            canvas_widget.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        else:
+            tk.Label(chart_frame, text="Not enough GFA data to display chart", 
+                    font=("Segoe UI", 11), bg="white", fg="#757575").pack(pady=20)
+        
+        # Recent Reviews Table
+        table_frame = tk.Frame(content, bg="white")
+        table_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        tk.Label(table_frame, text="Recent Reviews", 
+                font=("Segoe UI", 16, "bold"), bg="white", fg="#1976D2").pack(anchor="w", pady=(0, 10))
+        
+        # Create table
+        table = tk.Frame(table_frame, bg="white")
+        table.pack(fill=tk.X)
+        
+        headers = ["Date", "Game Grade", "Difficulty", "Avg GFA Score"]
+        for i, header in enumerate(headers):
+            tk.Label(table, text=header, font=("Segoe UI", 10, "bold"), 
+                    bg="#1976D2", fg="white", padx=10, pady=8).grid(row=0, column=i, sticky="ew")
+        
+        # Show last 10 reviews
+        for idx, review in enumerate(reversed(reviews[-10:])):
+            date = review.get('metadata', {}).get('date', 'N/A')
+            grade = review.get('metadata', {}).get('game_grade', 'N/A')
+            diff = review.get('difficulty', 'N/A')
+            
+            gfa_scores = review.get('gfa_scores', {})
+            if gfa_scores:
+                scores = [v for v in gfa_scores.values() if isinstance(v, (int, float))]
+                avg_gfa = f"{sum(scores)/len(scores):.1f}" if scores else "N/A"
+            else:
+                avg_gfa = "N/A"
+            
+            bg_color = "#F5F5F5" if idx % 2 == 0 else "white"
+            
+            tk.Label(table, text=date, font=("Segoe UI", 9), 
+                    bg=bg_color, padx=10, pady=6).grid(row=idx+1, column=0, sticky="ew")
+            tk.Label(table, text=grade, font=("Segoe UI", 9), 
+                    bg=bg_color, padx=10, pady=6).grid(row=idx+1, column=1, sticky="ew")
+            tk.Label(table, text=str(diff), font=("Segoe UI", 9), 
+                    bg=bg_color, padx=10, pady=6).grid(row=idx+1, column=2, sticky="ew")
+            tk.Label(table, text=avg_gfa, font=("Segoe UI", 9), 
+                    bg=bg_color, padx=10, pady=6).grid(row=idx+1, column=3, sticky="ew")
+        
+        # Close button
+        button_frame = tk.Frame(content, bg="white")
+        button_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        tk.Button(button_frame, text="Close", command=dashboard.destroy,
+                 font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
+                 padx=30, pady=10, relief=tk.FLAT, cursor="hand2").pack()
+        
+        # Pack canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Bind mousewheel
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+    
     def show_about_dialog(self):
         """Show the About dialog"""
         about_window = tk.Toplevel(self.root)
@@ -668,16 +882,70 @@ class CRRDFReviewApp:
                 bg="#FAFAFA", fg="#212121").pack(pady=10)
         
         # Input fields
-        fields = [
-            ("Game & Grade:", "game_grade", "e.g., Premier 1, Senior 2"),
-            ("Date:", "date", self.session.metadata["date"]),
+        self.metadata_entries = {}
+        
+        # Game & Grade - Dropdown
+        container = tk.Frame(frame, bg="#FAFAFA")
+        container.pack(fill=tk.X, pady=5, padx=20)
+        tk.Label(container, text="Game & Grade:", width=15, anchor="w",
+                bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(side=tk.LEFT)
+        
+        grade_var = tk.StringVar(value=self.session.metadata.get('game_grade', ''))
+        grade_combo = ttk.Combobox(container, textvariable=grade_var, values=GAME_GRADES, 
+                                   font=("Segoe UI", 10), width=38, state='readonly')
+        grade_combo.pack(side=tk.LEFT, padx=5)
+        if not self.session.metadata.get('game_grade'):
+            grade_combo.set('Select grade...')
+        
+        # Create a wrapper to match PlaceholderEntry interface
+        class ComboWrapper:
+            def __init__(self, combo, var):
+                self.combo = combo
+                self.var = var
+            def get_value(self):
+                val = self.var.get()
+                return "" if val == "Select grade..." else val
+        
+        self.metadata_entries['game_grade'] = ComboWrapper(grade_combo, grade_var)
+        
+        # Date - Manual entry with format hint
+        container = tk.Frame(frame, bg="#FAFAFA")
+        container.pack(fill=tk.X, pady=5, padx=20)
+        tk.Label(container, text="Date:", width=15, anchor="w",
+                bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(side=tk.LEFT)
+        
+        # Parse existing date or use today
+        date_value = self.session.metadata.get('date', datetime.now().strftime("%Y-%m-%d"))
+        
+        date_entry = PlaceholderEntry(container, placeholder="YYYY-MM-DD", width=40, font=("Segoe UI", 10))
+        date_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Set default value
+        if date_value:
+            date_entry.delete(0, tk.END)
+            date_entry.insert(0, date_value)
+            date_entry.config(fg=date_entry.default_fg_color)
+        
+        # Add "Today" button
+        def set_today():
+            date_entry.delete(0, tk.END)
+            date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
+            date_entry.config(fg=date_entry.default_fg_color)
+        
+        tk.Button(container, text="Today", command=set_today,
+                 font=("Segoe UI", 9), bg="#E0E0E0", fg="#212121",
+                 padx=10, pady=4, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
+        self.metadata_entries['date'] = date_entry
+        
+        # Rest of fields - Text entries
+        other_fields = [
             ("Result:", "result", "e.g., Home 24-17 Away"),
             ("Referee:", "referee", "Your name"),
             ("Coach:", "coach", "Coach name (optional)")
         ]
         
-        self.metadata_entries = {}
-        for label, key, placeholder in fields:
+        for label, key, placeholder in other_fields:
             container = tk.Frame(frame, bg="#FAFAFA")
             container.pack(fill=tk.X, pady=5, padx=20)
             
@@ -692,7 +960,7 @@ class CRRDFReviewApp:
             if self.session.metadata.get(key):
                 entry.delete(0, tk.END)
                 entry.insert(0, self.session.metadata[key])
-                entry.config(fg=entry.default_fg_color)  # Not placeholder color
+                entry.config(fg=entry.default_fg_color)
         
         # Goals section
         tk.Label(frame, text="\nMatch Goals", font=("Segoe UI", 14, "bold"),
