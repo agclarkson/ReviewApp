@@ -41,32 +41,47 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller openpyxl ttkbootstrap pillow matplotlib
 
+      - name: List files before build
+        run: |
+          echo "Current directory contents:"
+          ls -la
+        shell: bash
+
       - name: Build executable with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --name="Rugby Referee Review" --icon=NONE --version-file=version_info.txt --noupx referee_review_app.py
+          echo "Building Windows executable..."
+          pyinstaller --onefile --windowed --name="Rugby Referee Review" --icon=NONE referee_review_app.py
+          echo "Build complete. Checking dist folder:"
+          dir dist
           mkdir release
-          copy dist\\"Rugby Referee Review.exe" release\\
-          copy README.md release\\
-          copy QUICK_START.md release\\
+          copy "dist\Rugby Referee Review.exe" release\
+          copy README.md release\
+          if exist QUICK_START.md copy QUICK_START.md release\
 
       - name: Build executable with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller --onefile --windowed --name="Rugby Referee Review" --noupx referee_review_app.py
+          echo "Building macOS executable..."
+          pyinstaller --onefile --windowed --name="Rugby Referee Review" referee_review_app.py
+          echo "Build complete. Checking dist folder:"
+          ls -la dist/
           mkdir release
           cp "dist/Rugby Referee Review" release/
           cp README.md release/
-          cp QUICK_START.md release/
+          [ -f QUICK_START.md ] && cp QUICK_START.md release/ || true
 
       - name: Build executable with PyInstaller (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          pyinstaller --onefile --windowed --name="rugby-referee-review" --noupx referee_review_app.py
+          echo "Building Linux executable..."
+          pyinstaller --onefile --windowed --name="rugby-referee-review" referee_review_app.py
+          echo "Build complete. Checking dist folder:"
+          ls -la dist/
           mkdir release
           cp dist/rugby-referee-review release/
           cp README.md release/
-          cp QUICK_START.md release/
+          [ -f QUICK_START.md ] && cp QUICK_START.md release/ || true
 
       - name: Package Windows release
         if: matrix.os == 'windows-latest'
