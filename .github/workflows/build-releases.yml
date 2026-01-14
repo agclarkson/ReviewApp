@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller openpyxl
+          pip install pyinstaller openpyxl ttkbootstrap pillow
 
       - name: Build executable with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'

@@ -1,11 +1,35 @@
 #!/usr/bin/env python3
 """
-ORRA Referee Review Application
-Structured review system based on CRRDF framework
+NZ Rugby Referee Review System
+Professional review application based on CRRDF framework
+
+Copyright © 2025 Andrew Clarkson
+All Rights Reserved
+
+This application implements the Community Rugby Referee Development Framework (CRRDF)
+published by New Zealand Rugby (February 2025).
+
+Licensed under MIT License
+
+Version: 2.0.0-phase1
 """
 
+__version__ = "2.0.0-phase1"
+__author__ = "Andrew Clarkson"
+__copyright__ = "Copyright © 2025 Andrew Clarkson"
+__license__ = "MIT"
+
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import messagebox, filedialog
+try:
+    import ttkbootstrap as ttk
+    from ttkbootstrap.constants import *
+    THEME_AVAILABLE = True
+except ImportError:
+    from tkinter import ttk
+    THEME_AVAILABLE = False
+    print("Warning: ttkbootstrap not available, using standard theme")
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -238,32 +262,49 @@ class CRRDFReviewApp:
     
     def __init__(self, root):
         self.root = root
-        self.root.title("ORRA Referee Review System")
-        self.root.geometry("1000x700")
+        self.root.title("Rugby Referee Review System")
+        
+        # Set minimum window size
+        self.root.minsize(900, 700)
+        
+        # Start with a good default size
+        self.root.geometry("1100x750")
+        
+        # Allow window to be resizable
+        self.root.resizable(True, True)
         
         self.session = ReviewSession()
         self.current_pillar = None
         self.current_question = 0
         
-        # Configure style
-        style = ttk.Style()
-        style.theme_use('clam')
+        # Apply modern theme if available
+        if THEME_AVAILABLE:
+            style = ttk.Style("cosmo")  # Modern, professional theme
+        else:
+            style = ttk.Style()
+            style.theme_use('clam')
         
         # Create main container
         self.create_widgets()
         
     def create_widgets(self):
         """Create the main UI"""
-        # Header
-        header = tk.Frame(self.root, bg="#003366", height=60)
+        # Header with modern color
+        header = tk.Frame(self.root, bg="#1976D2", height=80)
         header.pack(fill=tk.X)
+        header.pack_propagate(False)  # Maintain fixed height
         
-        title = tk.Label(header, text="ORRA Referee Review System", 
-                        font=("Arial", 18, "bold"), bg="#003366", fg="white")
-        title.pack(pady=15)
+        title = tk.Label(header, text="Rugby Referee Review System", 
+                        font=("Segoe UI", 18, "bold"), bg="#1976D2", fg="white")
+        title.pack(pady=(15, 5))
+        
+        # Subtitle with copyright
+        subtitle = tk.Label(header, text="Based on CRRDF Framework  •  © 2025 Andrew Clarkson", 
+                           font=("Segoe UI", 9), bg="#1976D2", fg="#E3F2FD")
+        subtitle.pack()
         
         # Main content area
-        self.content = tk.Frame(self.root, bg="#f0f0f0")
+        self.content = tk.Frame(self.root, bg="#FAFAFA")
         self.content.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
         # Start with metadata entry
@@ -273,11 +314,23 @@ class CRRDFReviewApp:
         """Game metadata entry screen"""
         self.clear_content()
         
-        frame = tk.Frame(self.content, bg="#f0f0f0")
-        frame.pack(fill=tk.BOTH, expand=True)
+        # Create scrollable canvas
+        canvas = tk.Canvas(self.content, bg="#FAFAFA", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg="#FAFAFA")
         
-        tk.Label(frame, text="Game Information", font=("Arial", 16, "bold"),
-                bg="#f0f0f0").pack(pady=10)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=1050)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        frame = scrollable_frame
+        
+        tk.Label(frame, text="Game Information", font=("Segoe UI", 16, "bold"),
+                bg="#FAFAFA", fg="#212121").pack(pady=10)
         
         # Input fields
         fields = [
@@ -290,48 +343,68 @@ class CRRDFReviewApp:
         
         self.metadata_entries = {}
         for label, key, placeholder in fields:
-            container = tk.Frame(frame, bg="#f0f0f0")
-            container.pack(fill=tk.X, pady=5)
+            container = tk.Frame(frame, bg="#FAFAFA")
+            container.pack(fill=tk.X, pady=5, padx=20)
             
             tk.Label(container, text=label, width=15, anchor="w",
-                    bg="#f0f0f0", font=("Arial", 10, "bold")).pack(side=tk.LEFT)
+                    bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(side=tk.LEFT)
             
-            entry = PlaceholderEntry(container, placeholder=placeholder, width=40, font=("Arial", 10))
+            entry = PlaceholderEntry(container, placeholder=placeholder, width=40, font=("Segoe UI", 10))
             entry.pack(side=tk.LEFT, padx=5)
             self.metadata_entries[key] = entry
         
         # Goals section
-        tk.Label(frame, text="\nMatch Goals", font=("Arial", 14, "bold"),
-                bg="#f0f0f0").pack(pady=10)
+        tk.Label(frame, text="\nMatch Goals", font=("Segoe UI", 14, "bold"),
+                bg="#FAFAFA", fg="#212121").pack(pady=10)
         
-        tk.Label(frame, text="Primary Goal:", anchor="w", bg="#f0f0f0",
-                font=("Arial", 10, "bold")).pack(fill=tk.X, padx=20)
+        tk.Label(frame, text="Primary Goal:", anchor="w", bg="#FAFAFA",
+                font=("Segoe UI", 10, "bold"), fg="#212121").pack(fill=tk.X, padx=20)
         self.primary_goal = PlaceholderText(frame, placeholder="What is your main focus for this game? e.g., 'Improve accuracy in jackler decisions at breakdown'", 
-                                           height=2, width=60, font=("Arial", 10), wrap=tk.WORD)
+                                           height=2, width=60, font=("Segoe UI", 10), wrap=tk.WORD)
         self.primary_goal.pack(padx=20, pady=5)
         
-        tk.Label(frame, text="Secondary Goal:", anchor="w", bg="#f0f0f0",
-                font=("Arial", 10, "bold")).pack(fill=tk.X, padx=20)
+        tk.Label(frame, text="Secondary Goal:", anchor="w", bg="#FAFAFA",
+                font=("Segoe UI", 10, "bold"), fg="#212121").pack(fill=tk.X, padx=20)
         self.secondary_goal = PlaceholderText(frame, placeholder="Your secondary focus area? e.g., 'Better positioning at scrum time'", 
-                                             height=2, width=60, font=("Arial", 10), wrap=tk.WORD)
+                                             height=2, width=60, font=("Segoe UI", 10), wrap=tk.WORD)
         self.secondary_goal.pack(padx=20, pady=5)
         
         # Difficulty scale
         tk.Label(frame, text="\nGame Difficulty (1=Easy, 10=Very Hard):",
-                bg="#f0f0f0", font=("Arial", 10, "bold")).pack(pady=10)
+                bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(pady=10)
         
         self.difficulty_var = tk.IntVar(value=5)
+        
+        # Display current value
+        difficulty_value_label = tk.Label(frame, text="Current: 5", 
+                                         font=("Segoe UI", 10), bg="#FAFAFA", fg="#1976D2")
+        difficulty_value_label.pack()
+        
+        def update_difficulty_label(val):
+            difficulty_value_label.config(text=f"Current: {val}")
+        
         difficulty_scale = tk.Scale(frame, from_=1, to=10, orient=tk.HORIZONTAL,
-                                   variable=self.difficulty_var, length=300)
+                                   variable=self.difficulty_var, length=300, 
+                                   bg="#FAFAFA", highlightthickness=0,
+                                   command=update_difficulty_label)
         difficulty_scale.pack()
         
-        # Navigation
-        nav = tk.Frame(frame, bg="#f0f0f0")
+        # Navigation with modern styling
+        nav = tk.Frame(frame, bg="#FAFAFA")
         nav.pack(pady=20)
         
         tk.Button(nav, text="Next: Self Reflection", command=self.show_self_reflection,
-                 font=("Arial", 11, "bold"), bg="#00796b", fg="white",
-                 padx=20, pady=10).pack()
+                 font=("Segoe UI", 11, "bold"), bg="#00796B", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack()
+        
+        # Pack canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Bind mousewheel
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
         
     def show_self_reflection(self):
         """Self reflection questions"""
@@ -344,11 +417,23 @@ class CRRDFReviewApp:
         
         self.clear_content()
         
-        frame = tk.Frame(self.content, bg="#f0f0f0")
-        frame.pack(fill=tk.BOTH, expand=True)
+        # Create scrollable canvas
+        canvas = tk.Canvas(self.content, bg="#FAFAFA", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg="#FAFAFA")
         
-        tk.Label(frame, text="Self Reflection", font=("Arial", 16, "bold"),
-                bg="#f0f0f0").pack(pady=10)
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=1050)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        frame = scrollable_frame
+        
+        tk.Label(frame, text="Self Reflection", font=("Segoe UI", 16, "bold"),
+                bg="#FAFAFA", fg="#212121").pack(pady=10)
         
         questions = [
             ("Did I meet my goals - why or why not? Give examples:", "goals_met", 
@@ -364,23 +449,33 @@ class CRRDFReviewApp:
         self.reflection_entries = {}
         
         for question, key, placeholder in questions:
-            tk.Label(frame, text=question, anchor="w", bg="#f0f0f0",
-                    font=("Arial", 10, "bold")).pack(fill=tk.X, padx=20, pady=(10, 5))
+            tk.Label(frame, text=question, anchor="w", bg="#FAFAFA",
+                    font=("Segoe UI", 10, "bold"), fg="#212121").pack(fill=tk.X, padx=20, pady=(10, 5))
             
             text = PlaceholderText(frame, placeholder=placeholder, height=4, width=70, 
-                                  font=("Arial", 10), wrap=tk.WORD)
+                                  font=("Segoe UI", 10), wrap=tk.WORD)
             text.pack(padx=20, pady=5)
             self.reflection_entries[key] = text
         
         # Navigation
-        nav = tk.Frame(frame, bg="#f0f0f0")
+        nav = tk.Frame(frame, bg="#FAFAFA")
         nav.pack(pady=20)
         
         tk.Button(nav, text="← Back", command=self.show_metadata_entry,
-                 font=("Arial", 10), padx=15, pady=8).pack(side=tk.LEFT, padx=5)
+                 font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                 padx=15, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
         tk.Button(nav, text="Next: CRRDF Deep Dive →", command=self.start_crrdf_questions,
-                 font=("Arial", 11, "bold"), bg="#00796b", fg="white",
-                 padx=20, pady=10).pack(side=tk.LEFT, padx=5)
+                 font=("Segoe UI", 11, "bold"), bg="#00796B", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
+        # Pack canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Bind mousewheel
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
     
     def start_crrdf_questions(self):
         """Begin CRRDF pillar-by-pillar questions"""
@@ -400,149 +495,137 @@ class CRRDFReviewApp:
             self.show_gfa_scoring()
             return
         
-        self.current_pillar = self.pillars[self.current_pillar_index]
-        pillar_data = CRRDF_QUESTIONS[self.current_pillar]
+        pillar_name = self.pillars[self.current_pillar_index]
+        pillar_data = CRRDF_QUESTIONS[pillar_name]
         
         self.clear_content()
         
-        frame = tk.Frame(self.content, bg="#f0f0f0")
+        frame = tk.Frame(self.content, bg="#FAFAFA")
         frame.pack(fill=tk.BOTH, expand=True)
         
-        # Progress indicator
-        progress_text = f"Pillar {self.current_pillar_index + 1} of {len(self.pillars)}"
-        tk.Label(frame, text=progress_text, font=("Arial", 10),
-                bg="#f0f0f0", fg="#666").pack(pady=5)
+        # Pillar title
+        tk.Label(frame, text=f"CRRDF: {pillar_data['title']}", 
+                font=("Segoe UI", 18, "bold"), bg="#FAFAFA", fg="#1976D2").pack(pady=20)
         
-        tk.Label(frame, text=pillar_data["title"], font=("Arial", 18, "bold"),
-                bg="#f0f0f0", fg="#00796b").pack(pady=20)
+        tk.Label(frame, text=f"This section has {len(pillar_data['questions'])} question(s).",
+                font=("Segoe UI", 11), bg="#FAFAFA", fg="#757575").pack(pady=10)
         
-        # Description based on pillar
-        descriptions = {
-            "technical": "Law application, decision-making based on player actions, game innovations",
-            "tactical": "Tactical awareness, advantage application, positioning, game context",
-            "management": "Game management level, safety, strategies, captain interaction",
-            "mental": "Preparation, managing clutter, coachability, soft skills",
-            "physical": "Fitness, keeping up with play, positioning"
-        }
-        
-        tk.Label(frame, text=descriptions.get(self.current_pillar, ""),
-                font=("Arial", 11), bg="#f0f0f0", wraplength=600).pack(pady=10)
-        
-        tk.Label(frame, text=f"\n{len(pillar_data['questions'])} questions to help deepen your reflection",
-                font=("Arial", 10), bg="#f0f0f0").pack(pady=10)
+        tk.Label(frame, text="Each question includes prompts to help you reflect deeply.\nBe specific with examples and time stamps where possible.",
+                font=("Segoe UI", 10), bg="#FAFAFA", fg="#757575", justify=tk.CENTER).pack(pady=10)
         
         # Navigation
-        nav = tk.Frame(frame, bg="#f0f0f0")
-        nav.pack(pady=40)
+        nav = tk.Frame(frame, bg="#FAFAFA")
+        nav.pack(pady=30)
         
-        tk.Button(nav, text="Begin Questions →", command=self.show_crrdf_question,
-                 font=("Arial", 12, "bold"), bg="#00796b", fg="white",
-                 padx=30, pady=15).pack()
+        if self.current_pillar_index > 0:
+            tk.Button(nav, text="← Back", command=self.previous_pillar,
+                     font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                     padx=15, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(nav, text="Start Questions →", 
+                 command=lambda: self.show_pillar_question(pillar_name, 0),
+                 font=("Segoe UI", 11, "bold"), bg="#00796B", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
     
-    def show_crrdf_question(self):
-        """Show individual CRRDF question"""
-        pillar_data = CRRDF_QUESTIONS[self.current_pillar]
+    def show_pillar_question(self, pillar_name, question_index):
+        """Show a specific question from a pillar"""
+        pillar_data = CRRDF_QUESTIONS[pillar_name]
         
-        if self.current_question >= len(pillar_data["questions"]):
+        if question_index >= len(pillar_data['questions']):
             # Move to next pillar
-            self.current_question = 0
             self.current_pillar_index += 1
             self.show_pillar_intro()
             return
         
-        question_data = pillar_data["questions"][self.current_question]
+        question_data = pillar_data['questions'][question_index]
         
         self.clear_content()
         
-        frame = tk.Frame(self.content, bg="#f0f0f0")
+        frame = tk.Frame(self.content, bg="#FAFAFA")
         frame.pack(fill=tk.BOTH, expand=True)
         
-        # Progress
-        progress = f"{pillar_data['title']} - Q{self.current_question + 1}/{len(pillar_data['questions'])}"
-        tk.Label(frame, text=progress, font=("Arial", 10), bg="#f0f0f0",
-                fg="#666").pack(pady=5)
+        # Progress indicator
+        progress_text = f"{pillar_data['title']} - Question {question_index + 1} of {len(pillar_data['questions'])}"
+        tk.Label(frame, text=progress_text, font=("Segoe UI", 10), 
+                bg="#FAFAFA", fg="#757575").pack(pady=5)
         
         # Question
-        q_frame = tk.Frame(frame, bg="white", relief=tk.RAISED, borderwidth=2)
-        q_frame.pack(fill=tk.X, padx=30, pady=20)
-        
-        tk.Label(q_frame, text=question_data["q"], font=("Arial", 13, "bold"),
-                bg="white", wraplength=650, justify=tk.LEFT).pack(padx=20, pady=15)
+        tk.Label(frame, text=question_data['q'], font=("Segoe UI", 13, "bold"),
+                bg="#FAFAFA", fg="#212121", wraplength=800, justify=tk.LEFT).pack(pady=15, padx=20)
         
         # Prompts
-        if question_data.get("prompts"):
-            prompt_frame = tk.Frame(frame, bg="#e3f2fd")
-            prompt_frame.pack(fill=tk.X, padx=40, pady=10)
-            
-            tk.Label(prompt_frame, text="Think about:", font=("Arial", 10, "italic"),
-                    bg="#e3f2fd").pack(anchor="w", padx=15, pady=5)
-            
-            for prompt in question_data["prompts"]:
-                tk.Label(prompt_frame, text=f"• {prompt}", font=("Arial", 10),
-                        bg="#e3f2fd", wraplength=600, justify=tk.LEFT).pack(
-                        anchor="w", padx=30, pady=2)
+        tk.Label(frame, text="Think about:", font=("Segoe UI", 10, "bold"),
+                bg="#FAFAFA", fg="#00796B").pack(anchor=tk.W, padx=20)
+        
+        for prompt in question_data['prompts']:
+            prompt_frame = tk.Frame(frame, bg="#FAFAFA")
+            prompt_frame.pack(anchor=tk.W, padx=40, pady=2)
+            tk.Label(prompt_frame, text="•", font=("Segoe UI", 10),
+                    bg="#FAFAFA", fg="#00796B").pack(side=tk.LEFT)
+            tk.Label(prompt_frame, text=prompt, font=("Segoe UI", 10),
+                    bg="#FAFAFA", fg="#757575").pack(side=tk.LEFT, padx=5)
         
         # Answer area
-        tk.Label(frame, text="Your reflection:", font=("Arial", 11, "bold"),
-                bg="#f0f0f0").pack(anchor="w", padx=40, pady=(20, 5))
+        tk.Label(frame, text="\nYour Response:", font=("Segoe UI", 10, "bold"),
+                bg="#FAFAFA", fg="#212121").pack(anchor=tk.W, padx=20, pady=(15, 5))
         
-        # Create helpful placeholder based on the question type
-        placeholder_text = "Be specific with examples, include time stamps if possible, describe what you did and the impact it had..."
+        # Get or create text widget for this question
+        key = f"{pillar_name}_{question_index}"
+        if not hasattr(self, 'pillar_answers'):
+            self.pillar_answers = {}
         
-        self.current_answer = PlaceholderText(frame, placeholder=placeholder_text,
-                                             height=8, width=70, font=("Arial", 10), wrap=tk.WORD)
-        self.current_answer.pack(padx=40, pady=5)
+        text = PlaceholderText(frame, placeholder="Be specific with examples, include time stamps where relevant...",
+                              height=6, width=80, font=("Segoe UI", 10), wrap=tk.WORD)
+        text.pack(padx=20, pady=5)
+        
+        # Restore previous answer if it exists
+        if key in self.pillar_answers:
+            text.delete("1.0", tk.END)
+            text.insert("1.0", self.pillar_answers[key])
+        
+        self.current_answer_widget = text
+        self.current_answer_key = key
         
         # Navigation
-        nav = tk.Frame(frame, bg="#f0f0f0")
+        nav = tk.Frame(frame, bg="#FAFAFA")
         nav.pack(pady=20)
         
-        if self.current_question > 0 or self.current_pillar_index > 0:
-            tk.Button(nav, text="← Previous", command=self.previous_question,
-                     font=("Arial", 10), padx=15, pady=8).pack(side=tk.LEFT, padx=5)
-        
-        next_text = "Next Question →" if self.current_question < len(pillar_data["questions"]) - 1 else "Complete Pillar →"
-        tk.Button(nav, text=next_text, command=self.save_and_next_question,
-                 font=("Arial", 11, "bold"), bg="#00796b", fg="white",
-                 padx=20, pady=10).pack(side=tk.LEFT, padx=5)
+        if question_index > 0:
+            tk.Button(nav, text="← Previous", 
+                     command=lambda: [self.save_current_answer(), 
+                                    self.show_pillar_question(pillar_name, question_index - 1)],
+                     font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                     padx=15, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(nav, text="Next →" if question_index < len(pillar_data['questions']) - 1 else "Complete Pillar →",
+                 command=lambda: [self.save_current_answer(), 
+                                self.show_pillar_question(pillar_name, question_index + 1)],
+                 font=("Segoe UI", 11, "bold"), bg="#00796B", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
     
-    def previous_question(self):
-        """Go back to previous question"""
-        if self.current_question > 0:
-            self.current_question -= 1
-        else:
+    def save_current_answer(self):
+        """Save the current answer"""
+        if hasattr(self, 'current_answer_widget') and hasattr(self, 'current_answer_key'):
+            answer = self.current_answer_widget.get_value()
+            self.pillar_answers[self.current_answer_key] = answer
+            
+            # Also save to session
+            if not hasattr(self.session, 'crrdf_reflections'):
+                self.session.crrdf_reflections = {}
+            self.session.crrdf_reflections[self.current_answer_key] = answer
+    
+    def previous_pillar(self):
+        """Go back to previous pillar"""
+        if self.current_pillar_index > 0:
             self.current_pillar_index -= 1
-            if self.current_pillar_index >= 0:
-                self.current_pillar = self.pillars[self.current_pillar_index]
-                pillar_data = CRRDF_QUESTIONS[self.current_pillar]
-                self.current_question = len(pillar_data["questions"]) - 1
-        
-        self.show_crrdf_question()
-    
-    def save_and_next_question(self):
-        """Save current answer and move to next"""
-        pillar_data = CRRDF_QUESTIONS[self.current_pillar]
-        question_data = pillar_data["questions"][self.current_question]
-        
-        # Save answer
-        key = f"{self.current_pillar}_{self.current_question}"
-        self.session.crrdf_reflections[key] = {
-            "pillar": pillar_data["title"],
-            "question": question_data["q"],
-            "answer": self.current_answer.get_value()
-        }
-        
-        self.current_question += 1
-        self.show_crrdf_question()
+            self.show_pillar_intro()
     
     def show_gfa_scoring(self):
-        """Game Focus Area scoring"""
+        """GFA scoring interface"""
         self.clear_content()
         
         # Create scrollable frame
-        canvas = tk.Canvas(self.content, bg="#f0f0f0")
+        canvas = tk.Canvas(self.content, bg="#FAFAFA", highlightthickness=0)
         scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg="#f0f0f0")
+        scrollable_frame = tk.Frame(canvas, bg="#FAFAFA")
         
         scrollable_frame.bind(
             "<Configure>",
@@ -552,280 +635,269 @@ class CRRDFReviewApp:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        # Title
+        tk.Label(scrollable_frame, text="Game Focus Area Scoring", 
+                font=("Segoe UI", 18, "bold"), bg="#FAFAFA", fg="#1976D2").pack(pady=15)
         
-        tk.Label(scrollable_frame, text="Game Focus Areas (GFA) Scoring",
-                font=("Arial", 16, "bold"), bg="#f0f0f0").pack(pady=10)
+        tk.Label(scrollable_frame, text="Rate your performance in each focus area (1-5 scale)",
+                font=("Segoe UI", 11), bg="#FAFAFA", fg="#757575").pack(pady=5)
         
-        tk.Label(scrollable_frame, text="Rate your performance in each area (1-5 scale)",
-                font=("Arial", 11), bg="#f0f0f0").pack(pady=5)
+        # Rating scale reference
+        scale_frame = tk.Frame(scrollable_frame, bg="#E3F2FD", relief=tk.RIDGE, bd=1)
+        scale_frame.pack(pady=15, padx=20, fill=tk.X)
         
-        self.gfa_entries = {}
+        tk.Label(scale_frame, text="Rating Scale Reference:", font=("Segoe UI", 10, "bold"),
+                bg="#E3F2FD", fg="#1976D2").pack(pady=5)
+        
+        for score, description in RATING_SCALE.items():
+            tk.Label(scale_frame, text=f"{score} - {description}", 
+                    font=("Segoe UI", 9), bg="#E3F2FD", fg="#212121",
+                    wraplength=700, justify=tk.LEFT).pack(anchor=tk.W, padx=10, pady=2)
+        
+        # GFA Categories
+        self.gfa_vars = {}
         
         for category, aspects in GFA_CATEGORIES.items():
             # Category header
-            cat_frame = tk.Frame(scrollable_frame, bg="#00796b")
-            cat_frame.pack(fill=tk.X, padx=20, pady=(15, 0))
+            cat_frame = tk.Frame(scrollable_frame, bg="#FFFFFF", relief=tk.RIDGE, bd=1)
+            cat_frame.pack(pady=10, padx=20, fill=tk.X)
             
-            tk.Label(cat_frame, text=category, font=("Arial", 12, "bold"),
-                    bg="#00796b", fg="white").pack(padx=10, pady=8)
+            tk.Label(cat_frame, text=category, font=("Segoe UI", 12, "bold"),
+                    bg="#00796B", fg="white").pack(fill=tk.X, pady=5)
             
-            # Aspects - now tuples with (name, description)
-            for aspect_name, aspect_desc in aspects:
-                aspect_frame = tk.Frame(scrollable_frame, bg="white", relief=tk.RAISED, borderwidth=1)
-                aspect_frame.pack(fill=tk.X, padx=30, pady=5)
+            for aspect_name, description in aspects:
+                aspect_frame = tk.Frame(cat_frame, bg="#FFFFFF")
+                aspect_frame.pack(fill=tk.X, padx=15, pady=8)
                 
-                # Left side - aspect name and description
-                left_frame = tk.Frame(aspect_frame, bg="white")
-                left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+                # Aspect name and description
+                label_frame = tk.Frame(aspect_frame, bg="#FFFFFF")
+                label_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
                 
-                tk.Label(left_frame, text=aspect_name, font=("Arial", 10, "bold"),
-                        bg="white", anchor="w").pack(fill=tk.X)
+                tk.Label(label_frame, text=aspect_name, font=("Segoe UI", 10, "bold"),
+                        bg="#FFFFFF", fg="#212121", anchor="w").pack(fill=tk.X)
+                tk.Label(label_frame, text=description, font=("Segoe UI", 9),
+                        bg="#FFFFFF", fg="#757575", wraplength=500, 
+                        justify=tk.LEFT, anchor="w").pack(fill=tk.X)
                 
-                tk.Label(left_frame, text=aspect_desc, font=("Arial", 9),
-                        bg="white", fg="#666", anchor="w", wraplength=500, justify=tk.LEFT).pack(fill=tk.X, pady=(2, 0))
+                # Rating scale
+                rating_frame = tk.Frame(aspect_frame, bg="#FFFFFF")
+                rating_frame.pack(side=tk.RIGHT)
                 
-                # Right side - radio buttons
-                score_var = tk.IntVar(value=3)
-                self.gfa_entries[f"{category}_{aspect_name}"] = score_var
-                
-                score_frame = tk.Frame(aspect_frame, bg="white")
-                score_frame.pack(side=tk.RIGHT, padx=10)
+                var = tk.IntVar(value=3)
+                self.gfa_vars[f"{category}_{aspect_name}"] = var
                 
                 for i in range(1, 6):
-                    rb = tk.Radiobutton(score_frame, text=str(i), variable=score_var,
-                                       value=i, font=("Arial", 10), bg="white")
-                    rb.pack(side=tk.LEFT, padx=5)
-        
-        # Rating scale reference
-        scale_frame = tk.Frame(scrollable_frame, bg="#fff3cd", relief=tk.RAISED, borderwidth=2)
-        scale_frame.pack(fill=tk.X, padx=20, pady=20)
-        
-        tk.Label(scale_frame, text="Rating Scale Reference:", font=("Arial", 10, "bold"),
-                bg="#fff3cd").pack(anchor="w", padx=10, pady=5)
-        
-        for rating, desc in RATING_SCALE.items():
-            tk.Label(scale_frame, text=f"{rating}: {desc}", font=("Arial", 9),
-                    bg="#fff3cd", wraplength=700, justify=tk.LEFT).pack(
-                    anchor="w", padx=20, pady=2)
+                    tk.Radiobutton(rating_frame, text=str(i), variable=var, value=i,
+                                  bg="#FFFFFF", font=("Segoe UI", 9),
+                                  selectcolor="#4CAF50").pack(side=tk.LEFT, padx=3)
         
         # Navigation
-        nav = tk.Frame(scrollable_frame, bg="#f0f0f0")
+        nav = tk.Frame(scrollable_frame, bg="#FAFAFA")
         nav.pack(pady=20)
         
-        tk.Button(nav, text="← Back", command=self.start_crrdf_questions,
-                 font=("Arial", 10), padx=15, pady=8).pack(side=tk.LEFT, padx=5)
-        tk.Button(nav, text="Save & Export →", command=self.export_review,
-                 font=("Arial", 12, "bold"), bg="#00796b", fg="white",
-                 padx=30, pady=15).pack(side=tk.LEFT, padx=5)
+        tk.Button(nav, text="← Back to CRRDF", command=self.back_to_last_pillar,
+                 font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
+                 padx=15, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(nav, text="Save & Export", command=self.export_to_excel,
+                 font=("Segoe UI", 11, "bold"), bg="#4CAF50", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
+        # Pack canvas and scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Bind mousewheel
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
     
-    def export_review(self):
-        """Export review to Excel"""
+    def back_to_last_pillar(self):
+        """Return to the last pillar"""
+        self.current_pillar_index = len(self.pillars) - 1
+        pillar_name = self.pillars[self.current_pillar_index]
+        last_q = len(CRRDF_QUESTIONS[pillar_name]['questions']) - 1
+        self.show_pillar_question(pillar_name, last_q)
+    
+    def export_to_excel(self):
+        """Export review to Excel file"""
         # Save GFA scores
-        for key, var in self.gfa_entries.items():
+        for key, var in self.gfa_vars.items():
             self.session.gfa_scores[key] = var.get()
         
-        # Get save location
-        filename = f"Referee_Review_{self.session.metadata['referee']}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-        filepath = filedialog.asksaveasfilename(
+        # Ask for save location
+        filename = filedialog.asksaveasfilename(
             defaultextension=".xlsx",
-            filetypes=[("Excel files", "*.xlsx")],
-            initialfile=filename
+            filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")],
+            initialfile=f"Review_{self.session.metadata['referee']}_{self.session.metadata['date']}.xlsx"
         )
         
-        if not filepath:
+        if not filename:
             return
         
         try:
-            self.create_excel_report(filepath)
-            messagebox.showinfo("Success", f"Review saved to:\n{filepath}")
-            
-            # Ask if user wants to start another review
-            if messagebox.askyesno("New Review", "Would you like to start another review?"):
-                self.session = ReviewSession()
-                self.show_metadata_entry()
-            else:
-                self.root.quit()
+            self._create_excel_export(filename)
+            messagebox.showinfo("Success", f"Review exported successfully to:\n{filename}")
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to save review:\n{str(e)}")
+            messagebox.showerror("Export Error", f"Failed to export:\n{str(e)}")
     
-    def create_excel_report(self, filepath):
-        """Create Excel file matching ORRA format"""
+    def _create_excel_export(self, filename):
+        """Create the Excel workbook"""
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Review"
+        ws.title = "Referee Review"
         
         # Styles
-        header_font = Font(bold=True, size=12)
-        title_font = Font(bold=True, size=14)
-        label_font = Font(bold=True, size=10)
-        
-        header_fill = PatternFill(start_color="003366", end_color="003366", fill_type="solid")
-        category_fill = PatternFill(start_color="00796b", end_color="00796b", fill_type="solid")
-        
-        white_font = Font(color="FFFFFF", bold=True)
+        header_font = Font(bold=True, size=14, color="FFFFFF")
+        header_fill = PatternFill(start_color="1976D2", end_color="1976D2", fill_type="solid")
+        subheader_font = Font(bold=True, size=12)
+        subheader_fill = PatternFill(start_color="E3F2FD", end_color="E3F2FD", fill_type="solid")
         
         border = Border(
-            left=Side(style='thin'),
-            right=Side(style='thin'),
-            top=Side(style='thin'),
-            bottom=Side(style='thin')
+            left=Side(style='thin'), right=Side(style='thin'),
+            top=Side(style='thin'), bottom=Side(style='thin')
         )
         
+        row = 1
+        
         # Title
-        ws.merge_cells('C4:E4')
-        ws['C4'] = "ORRA Review Document 2026"
-        ws['C4'].font = title_font
-        ws['C4'].alignment = Alignment(horizontal='center')
+        ws.merge_cells(f'A{row}:G{row}')
+        cell = ws.cell(row, 1, "Rugby Referee Review")
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center')
+        row += 1
+        
+        # Copyright
+        ws.merge_cells(f'A{row}:G{row}')
+        cell = ws.cell(row, 1, f"Based on CRRDF Framework  •  © 2025 Andrew Clarkson")
+        cell.font = Font(size=9, italic=True)
+        cell.alignment = Alignment(horizontal='center')
+        row += 2
         
         # Metadata
-        ws['B6'] = "Game & Grade:"
-        ws['B6'].font = label_font
-        ws['C6'] = self.session.metadata['game_grade']
-        ws['F6'] = "Referee:"
-        ws['F6'].font = label_font
-        ws['G6'] = self.session.metadata['referee']
+        ws.cell(row, 1, "Game Information").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        ws['B7'] = "Date:"
-        ws['B7'].font = label_font
-        ws['C7'] = self.session.metadata['date']
-        ws['F7'] = "Coach:"
-        ws['F7'].font = label_font
-        ws['G7'] = self.session.metadata['coach']
+        for key, label in [("game_grade", "Game & Grade:"), ("date", "Date:"), 
+                           ("result", "Result:"), ("referee", "Referee:"), ("coach", "Coach:")]:
+            ws.cell(row, 1, label).font = Font(bold=True)
+            ws.cell(row, 2, self.session.metadata.get(key, ""))
+            row += 1
         
-        ws['B8'] = "Result:"
-        ws['B8'].font = label_font
-        ws['C8'] = self.session.metadata['result']
-        ws['F8'] = "Date completed:"
-        ws['F8'].font = label_font
-        ws['G8'] = self.session.metadata['date_completed']
+        row += 1
+        ws.cell(row, 1, "Match Goals").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        # Match Goals
-        ws['B10'] = "Match Goals"
-        ws['B10'].font = header_font
-        ws['C10'] = "My key focus for this game is"
-        ws['C11'] = self.session.goals['primary']
-        ws['C10'].font = label_font
+        ws.cell(row, 1, "Primary:").font = Font(bold=True)
+        ws.cell(row, 2, self.session.goals.get("primary", ""))
+        row += 1
         
-        ws['C12'] = "My secondary focus area is"
-        ws['C12'].font = label_font
-        ws['C13'] = self.session.goals['secondary']
+        ws.cell(row, 1, "Secondary:").font = Font(bold=True)
+        ws.cell(row, 2, self.session.goals.get("secondary", ""))
+        row += 1
         
-        # Difficulty
-        ws['B15'] = f"How hard did I find this game to referee? {self.session.difficulty}/10"
-        ws['B15'].font = label_font
+        ws.cell(row, 1, "Difficulty (1-10):").font = Font(bold=True)
+        ws.cell(row, 2, str(self.session.difficulty))
+        row += 2
         
-        # Self Reflection
-        current_row = 17
-        ws[f'B{current_row}'] = "Self Reflection and Game Overview"
-        ws[f'B{current_row}'].font = header_font
-        current_row += 1
+        # Self Reflections
+        ws.cell(row, 1, "Self Reflection").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        reflection_questions = [
-            ("Did I meet my goals - why or why not, give some examples?", "goals_met", "Primary Goal / Secondary Goal"),
-            ("What areas of the game went well and why? (will likely relate to GFAs)", "what_went_well", ""),
-            ("What was the biggest challenge in the game? What would/could I do differently next time?", "biggest_challenge", ""),
-            ("What am I taking into my next game?", "taking_forward", "")
-        ]
+        for label, key in [("Goals Met:", "goals_met"), ("What Went Well:", "what_went_well"),
+                          ("Biggest Challenge:", "biggest_challenge"), ("Taking Forward:", "taking_forward")]:
+            ws.cell(row, 1, label).font = Font(bold=True)
+            ws.merge_cells(f'B{row}:G{row}')
+            ws.cell(row, 2, self.session.reflections.get(key, ""))
+            ws.cell(row, 2).alignment = Alignment(wrap_text=True, vertical='top')
+            row += 1
         
-        for question, key, note in reflection_questions:
-            ws[f'B{current_row}'] = question
-            ws[f'B{current_row}'].font = label_font
-            ws[f'C{current_row}'] = self.session.reflections.get(key, "")
-            if note:
-                ws[f'D{current_row}'] = note
-            current_row += 1
+        row += 1
         
-        # CRRDF Deep Dive Section
-        current_row += 2
-        ws[f'B{current_row}'] = "CRRDF Framework Deep Dive"
-        ws[f'B{current_row}'].font = title_font
-        ws[f'B{current_row}'].fill = header_fill
-        ws[f'B{current_row}'].font = white_font
-        current_row += 1
+        # CRRDF Reflections
+        ws.cell(row, 1, "CRRDF Framework Responses").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        for pillar in self.pillars:
-            pillar_data = CRRDF_QUESTIONS[pillar]
-            ws[f'B{current_row}'] = pillar_data['title']
-            ws[f'B{current_row}'].font = header_font
-            ws[f'B{current_row}'].fill = category_fill
-            ws[f'B{current_row}'].font = white_font
-            current_row += 1
-            
-            for q_idx in range(len(pillar_data['questions'])):
-                key = f"{pillar}_{q_idx}"
-                if key in self.session.crrdf_reflections:
-                    reflection = self.session.crrdf_reflections[key]
-                    ws[f'B{current_row}'] = reflection['question']
-                    ws[f'B{current_row}'].font = label_font
-                    current_row += 1
-                    ws[f'C{current_row}'] = reflection['answer']
-                    ws[f'C{current_row}'].alignment = Alignment(wrap_text=True, vertical='top')
-                    current_row += 1
-            
-            current_row += 1
+        if hasattr(self, 'pillar_answers'):
+            for pillar_name in self.pillars:
+                pillar_data = CRRDF_QUESTIONS[pillar_name]
+                ws.cell(row, 1, pillar_data['title']).font = Font(bold=True, size=11)
+                row += 1
+                
+                for q_idx, question_data in enumerate(pillar_data['questions']):
+                    key = f"{pillar_name}_{q_idx}"
+                    ws.cell(row, 1, f"Q: {question_data['q']}").font = Font(bold=True)
+                    row += 1
+                    
+                    ws.merge_cells(f'B{row}:G{row}')
+                    ws.cell(row, 2, self.pillar_answers.get(key, ""))
+                    ws.cell(row, 2).alignment = Alignment(wrap_text=True, vertical='top')
+                    row += 1
+                
+                row += 1
         
         # GFA Scores
-        current_row += 1
-        ws[f'B{current_row}'] = "GFA"
-        ws[f'D{current_row}'] = "GFA aspect"
-        ws[f'E{current_row}'] = "What this covers"
-        ws[f'F{current_row}'] = "Referee score"
-        ws[f'G{current_row}'] = "Coach score"
+        ws.cell(row, 1, "Game Focus Area Scores").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        for cell_ref in [f'B{current_row}', f'D{current_row}', f'E{current_row}', f'F{current_row}', f'G{current_row}']:
-            ws[cell_ref].font = label_font
-            ws[cell_ref].border = border
-        
-        current_row += 1
+        # GFA Headers
+        ws.cell(row, 1, "Category").font = Font(bold=True)
+        ws.cell(row, 2, "Aspect").font = Font(bold=True)
+        ws.cell(row, 3, "What this covers").font = Font(bold=True)
+        ws.cell(row, 4, "Self Score").font = Font(bold=True)
+        ws.cell(row, 5, "Coach Score").font = Font(bold=True)
+        row += 1
         
         for category, aspects in GFA_CATEGORIES.items():
-            for i, (aspect_name, aspect_desc) in enumerate(aspects):
-                if i == 0:
-                    ws[f'B{current_row}'] = category
-                    ws[f'B{current_row}'].font = label_font
-                
-                ws[f'D{current_row}'] = aspect_name
-                ws[f'E{current_row}'] = aspect_desc
-                ws[f'E{current_row}'].alignment = Alignment(wrap_text=True, vertical='top')
-                ws[f'E{current_row}'].font = Font(size=9, color="666666")
-                
+            for aspect_name, description in aspects:
+                ws.cell(row, 1, category)
+                ws.cell(row, 2, aspect_name)
+                ws.cell(row, 3, description)
                 key = f"{category}_{aspect_name}"
-                if key in self.session.gfa_scores:
-                    ws[f'F{current_row}'] = self.session.gfa_scores[key]
-                
-                for cell_ref in [f'B{current_row}', f'D{current_row}', f'E{current_row}', f'F{current_row}', f'G{current_row}']:
-                    ws[cell_ref].border = border
-                
-                current_row += 1
+                ws.cell(row, 4, self.session.gfa_scores.get(key, ""))
+                row += 1
         
-        # Rating scale reference
-        current_row += 2
-        for rating, desc in RATING_SCALE.items():
-            ws[f'B{current_row}'] = rating
-            ws[f'C{current_row}'] = desc
-            ws[f'C{current_row}'].alignment = Alignment(wrap_text=True)
-            current_row += 1
+        row += 1
         
-        # Adjust column widths
-        ws.column_dimensions['B'].width = 25
-        ws.column_dimensions['C'].width = 50
-        ws.column_dimensions['D'].width = 25
-        ws.column_dimensions['E'].width = 60
-        ws.column_dimensions['F'].width = 15
-        ws.column_dimensions['G'].width = 15
+        # Rating Scale
+        ws.cell(row, 1, "Rating Scale").font = subheader_font
+        ws.cell(row, 1).fill = subheader_fill
+        row += 1
         
-        wb.save(filepath)
+        for score, description in RATING_SCALE.items():
+            ws.cell(row, 1, str(score)).font = Font(bold=True)
+            ws.merge_cells(f'B{row}:G{row}')
+            ws.cell(row, 2, description)
+            ws.cell(row, 2).alignment = Alignment(wrap_text=True)
+            row += 1
+        
+        # Column widths
+        ws.column_dimensions['A'].width = 25
+        ws.column_dimensions['B'].width = 50
+        ws.column_dimensions['C'].width = 60
+        ws.column_dimensions['D'].width = 15
+        ws.column_dimensions['E'].width = 15
+        
+        wb.save(filename)
     
     def clear_content(self):
-        """Clear current content area"""
+        """Clear the content area"""
         for widget in self.content.winfo_children():
             widget.destroy()
 
 
 def main():
-    root = tk.Tk()
+    """Main entry point"""
+    if THEME_AVAILABLE:
+        root = ttk.Window(themename="cosmo")
+    else:
+        root = tk.Tk()
+    
     app = CRRDFReviewApp(root)
     root.mainloop()
 
