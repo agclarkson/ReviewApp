@@ -23,18 +23,23 @@ CRRDF_VERSION = "February 2025"
 
 # Common Rugby Game Grades
 GAME_GRADES = [
-    "Division 1",
-    "Southern Premier",
-    "Central Premier",
-    "Premier 1st XV",
-    "Division 2",
-    "Division 3",
-    "U20 Colts",
-    "U21 Colts Division 1",
-    "U21 Colts Division 2",
+    "Premier 1",
+    "Premier 2",
+    "Premier 3",
+    "Senior 1",
+    "Senior 2",
+    "Senior 3",
+    "Colts",
+    "U19",
+    "U18",
+    "U16",
+    "U14",
+    "Women's Premier",
     "Women's Division 1",
     "Women's Division 2",
-    "High School"
+    "Development",
+    "Club Rugby",
+    "Other"
 ]
 
 import tkinter as tk
@@ -827,15 +832,7 @@ class CRRDFReviewApp:
         tk.Button(content, text="Close", command=about_window.destroy,
                  font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
                  padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=20)
-        if THEME_AVAILABLE:
-            style = ttk.Style("cosmo")  # Modern, professional theme
-        else:
-            style = ttk.Style()
-            style.theme_use('clam')
-        
-        # Create main container
-        self.create_widgets()
-        
+    
     def create_widgets(self):
         """Create the main UI"""
         # Header with modern color
