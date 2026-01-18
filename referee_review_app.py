@@ -40,6 +40,8 @@ GAME_GRADES = [
 
 import tkinter as tk
 from tkinter import messagebox, filedialog
+import sys
+import os
 try:
     import ttkbootstrap as ttk
     from ttkbootstrap.constants import *
@@ -290,9 +292,18 @@ class CRRDFReviewApp:
         
         # Set window icon
         try:
-            # Try to load icon.ico for the window title bar
-            self.root.iconbitmap('icon.ico')
-        except:
+            # Get the correct path for icon whether running as script or bundled
+            if getattr(sys, 'frozen', False):
+                # Running as compiled executable
+                application_path = sys._MEIPASS
+            else:
+                # Running as script
+                application_path = os.path.dirname(os.path.abspath(__file__))
+            
+            icon_path = os.path.join(application_path, 'icon.ico')
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
             # If icon file not found, continue without it
             pass
         

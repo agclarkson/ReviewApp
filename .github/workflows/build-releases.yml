@@ -49,7 +49,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          pyinstaller --onefile --windowed --name "Rugby Referee Review" --icon icon.ico referee_review_app.py
+          pyinstaller --onefile --windowed --name "Rugby Referee Review" --icon icon.ico --add-data "icon.ico;." referee_review_app.py
           dir dist
 
       - name: Build with PyInstaller (macOS/Linux)
