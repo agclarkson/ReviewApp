@@ -49,13 +49,20 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         run: |
-          pyinstaller --onefile --windowed --name "Rugby Referee Review" --icon NONE referee_review_app.py
+          pyinstaller --onefile --windowed --name "Rugby Referee Review" --icon icon.ico referee_review_app.py
           dir dist
 
       - name: Build with PyInstaller (macOS/Linux)
         if: matrix.os != 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" referee_review_app.py
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            # Convert iconset to icns for macOS
+            iconutil -c icns icon.iconset -o icon.icns
+            pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" --icon icon.icns referee_review_app.py
+          else
+            # Linux - use PNG
+            pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" --icon icon_512.png referee_review_app.py
+          fi
           ls -la dist/
 
       - name: Create release folder

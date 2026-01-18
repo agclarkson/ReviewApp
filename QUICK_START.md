@@ -1,182 +1,181 @@
-# Quick Start Guide - ORRA Referee Review System
-
-## 🚀 Get Started in 3 Steps
-
-### Step 1: Install Python
-**Windows:**
-1. Go to https://www.python.org/downloads/
-2. Download the latest Python version
-3. Run installer - **IMPORTANT**: Check "Add Python to PATH"
-
-**Mac:**
-- Python 3 is usually pre-installed. Open Terminal and type `python3 --version` to check
-
-### Step 2: Run the Application
-**Windows:**
-- Double-click `launch_review_app.bat`
-
-**Mac/Linux:**
-- Double-click `launch_review_app.sh` or run in Terminal:
-  ```bash
-  ./launch_review_app.sh
-  ```
-
-### Step 3: Complete Your Review
-1. Enter game details and your goals
-2. Reflect on the match
-3. Answer CRRDF questions (system guides you through each pillar)
-4. Score your GFAs
-5. Export to Excel
-
-## 📋 What You'll Answer
-
-### Basic Info (2 minutes)
-- Game grade, date, result
-- Your match goals
-- Game difficulty
-
-### Self Reflection (5-10 minutes)
-- Did you meet your goals?
-- What went well?
-- Biggest challenge?
-- Taking forward?
-
-### CRRDF Deep Dive (15-20 minutes)
-**Technical Pillar** - Law application & safety
-- 3 questions with prompts
-
-**Tactical Pillar** - Awareness & positioning
-- 4 questions with prompts
-
-**Management Pillar** - Game management
-- 4 questions with prompts
-
-**Mental Pillar** - Preparation & resilience
-- 3 questions with prompts
-
-**Physical Pillar** - Fitness
-- 1 question with prompts
-
-### GFA Scoring (5 minutes)
-Rate yourself 1-5 in:
-- Tackle/Ruck areas
-- Scrum management
-- Lineout/Maul
-- Space management
-- Game management
-
-**Total Time: 30-45 minutes for a thorough review**
-
-## 💡 Pro Tips
-
-### Before You Start
-- Have your game notes ready
-- Review any video if available
-- Do the review within 24-48 hours (while fresh)
-
-### During the Review
-- Be specific with examples
-- Include time stamps when you remember them
-- Don't rush - quality over speed
-- Save your work by progressing through sections
-
-### After Exporting
-- Share Excel file with your coach
-- Keep a copy for your records
-- Review previous assessments to track progress
-
-## 🎯 Example Good Responses
-
-### ❌ Not Helpful
-"Breakdown was fine"
-
-### ✅ Helpful
-"Identified tackler release accurately in 8/10 situations. Strong in first half. Missed one crucial non-release in 65th minute in Red 22 - tackler stayed on ball preventing quick recycle. Need to maintain focus in final quarter."
-
-## 🔧 Troubleshooting
-
-### "Python is not recognized"
-- Reinstall Python and check "Add to PATH"
-- Or run: `set PATH=%PATH%;C:\Python3X` (replace X with version)
-
-### "Module not found: openpyxl"
-- Run: `pip install openpyxl`
-- Or use the launcher scripts which install it automatically
-
-### "Application won't start"
-- Run from command line to see errors:
-  - Windows: `python referee_review_app.py`
-  - Mac/Linux: `python3 referee_review_app.py`
-
-### "Can't save file"
-- Check you have write permissions in the folder
-- Try saving to Documents or Desktop
-- Close Excel if the file is already open
-
-## 📞 Getting Help
-
-**Technical Issues:**
-- Run launcher script - it checks for problems
-- Check README.md for detailed troubleshooting
-
-**Review Questions:**
-- See CRRDF Framework document
-- Consult with your coach
-- Refer to NZR referee resources
-
-## 🎓 Making the Most of Reviews
-
-### Review Frequency
-- **After every game** for Level 3-5 referees
-- **Weekly minimum** for development pathway
-- **Before coaching sessions** for structured feedback
-
-### Setting Goals
-- Make them **specific**: "Improve jackler identification at breakdown"
-- Make them **measurable**: "Accurate 9/10 times"
-- Make them **achievable**: Focus on 1-2 areas per game
-- Link to **CRRDF pillars** for systematic development
-
-### Tracking Progress
-- Keep all Excel files in a folder by season
-- Review your last 5 games to spot patterns
-- Share trends with your coach
-- Celebrate improvements!
-
-### Using CRRDF Effectively
-- Pick 1 pillar to focus on per game
-- Rotate through pillars over the season
-- Deep dive on areas where you got lower GFA scores
-- Connect your reflections to specific performance indicators
-
-## 📈 Development Pathway
-
-The app supports all community rugby levels:
-- **Level 1-2**: Focus on Technical & Physical pillars
-- **Level 3**: Add Tactical awareness and Management
-- **Level 4**: Strengthen all pillars, tactical sophistication
-- **Level 5**: Excellence across all pillars, ready for Development
-
-Use your reviews to:
-- Document evidence for promotion
-- Identify coaching needs
-- Track fitness standards
-- Build your referee CV
+# Quick Start Guide
+## Rugby Referee Review System
 
 ---
 
-## Quick Reference - Rating Scale
+## 🎯 First Time Setup (1 minute)
 
-| Score | Meaning | Description |
-|-------|---------|-------------|
-| **1** | Unacceptable | Fails to demonstrate required level. Errors significantly impacted game. |
-| **2** | Below Standard | Limited awareness. Errors had negative influence. |
-| **3** | Satisfactory | Adequate level. Minor errors didn't materially affect game. Meets expectations. |
-| **4** | Sound | Good awareness and execution. Generally accurate. Contributed positively. |
-| **5** | Excellent | Consistently high level. Accurate, proactive. Sets best practice. |
+1. **Launch the app** - Double-click the executable
+2. **Welcome screen appears**
+   - Enter your full name
+   - Enter your coach's name (optional)
+   - Click "Get Started"
+3. **Done!** Your name will auto-fill in every review
 
 ---
 
-**Remember**: The goal isn't perfection - it's **continuous improvement**. Be honest, be specific, and use each review to become a better referee!
+## ✍️ Creating a Review (5-10 minutes)
 
-Good luck with your refereeing! 🏉
+### Step 1: Game Information
+- **Game & Grade:** Select from dropdown
+- **Date:** Click "Today" or type YYYY-MM-DD
+- **Result:** e.g., "Home 24-17 Away"
+- **Referee:** (Auto-filled with your name)
+- **Coach:** (Auto-filled if you set one)
+
+Click **Next: Self Reflection** →
+
+### Step 2: Self Reflection
+Answer 3 general questions:
+1. What went well?
+2. What could be improved?
+3. Key learnings?
+
+Click **Next: CRRDF Deep Dive** →
+
+### Step 3: CRRDF Pillars
+Work through **5 pillars**, each with 3 questions:
+1. **Technical** - Laws and decisions
+2. **Tactical** - Game management
+3. **Management** - Player interactions
+4. **Mental** - Mindset and focus
+5. **Physical** - Fitness and positioning
+
+For each pillar:
+- Answer the 3 questions thoughtfully
+- Click **Next Pillar** to continue
+- Use **← Previous Pillar** if needed
+
+### Step 4: GFA Performance
+Rate yourself 1-5 in **10 areas**:
+- 1 = Unsatisfactory
+- 2 = Development Needed
+- 3 = Satisfactory
+- 4 = Sound
+- 5 = Excellent
+
+### Step 5: Coach Feedback
+Add any notes from your coach's review
+
+### Step 6: Save & Export
+Click **Save & Export to Excel**
+- Choose where to save Excel file
+- Review automatically saved to history
+
+**Done!** 🎉
+
+---
+
+## 📊 Viewing Analytics (30 seconds)
+
+1. **File → View Analytics**
+2. See your:
+   - Total reviews
+   - GFA trends over time
+   - Recent performance
+   - Statistics
+
+Close when done!
+
+---
+
+## 📂 Finding Past Reviews (30 seconds)
+
+### Quick Browse:
+1. **File → Browse All Reviews**
+2. See all reviews sorted by date
+3. **Search:** Type to filter
+4. **Load:** Double-click or click Load button
+5. **Delete:** Select and click Delete
+
+### Edit a Review:
+1. Load the review
+2. Make changes
+3. Save & Export again
+
+---
+
+## ⚙️ Updating Your Info (30 seconds)
+
+1. **Settings → Personal Info**
+2. Update name or coach
+3. Click **Save Changes**
+4. Future reviews use new info
+
+---
+
+## 💡 Tips
+
+### For Best Results:
+- ✅ Complete reviews within 24 hours
+- ✅ Be honest and specific
+- ✅ Use concrete examples
+- ✅ Review analytics monthly
+
+### Keyboard Shortcuts:
+- **Enter** - Submit welcome screen
+- **Tab** - Move between fields
+- **Esc** - Close dialogs
+
+### Data Locations:
+- **Reviews:** `Documents/RugbyRefereeReviews/`
+- **Config:** `~/.rugby_referee_review_config.json`
+
+---
+
+## ❓ Common Questions
+
+**Q: Do I need internet?**
+A: No! Works completely offline.
+
+**Q: Can I edit old reviews?**
+A: Yes! File → Browse All Reviews → Load
+
+**Q: Where are my reviews saved?**
+A: `Documents/RugbyRefereeReviews/` as JSON files
+
+**Q: Can I export multiple reviews?**
+A: Not yet - one at a time for now
+
+**Q: How do I backup my data?**
+A: Copy the `RugbyRefereeReviews` folder
+
+**Q: Can I change game grades?**
+A: Not in the UI yet - contact developer
+
+**Q: Why the Windows warning?**
+A: App isn't code-signed. Click "More info" → "Run anyway"
+
+---
+
+## 🆘 Need Help?
+
+### App Won't Start:
+- Check you have the right version for your OS
+- Try restarting your computer
+- Disable antivirus temporarily
+
+### Review Won't Save:
+- Check disk space
+- Ensure `Documents` folder is accessible
+- Try a different location for Excel
+
+### Analytics Empty:
+- Need at least 1 completed review
+- Check reviews saved to correct folder
+- Try creating a new review
+
+### Still Stuck?
+Contact the developer or check the full README
+
+---
+
+## 🚀 You're Ready!
+
+Start your first review and track your development journey!
+
+**Remember:** The more detailed your reflections, the more useful the app becomes for tracking your growth as a referee.
+
+---
+
+**Good luck with your games!** 🏉

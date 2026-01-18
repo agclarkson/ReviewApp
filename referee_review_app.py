@@ -10,10 +10,10 @@ This application implements the Community Rugby Referee Development Framework (C
 
 Licensed under MIT License
 
-Version: 2.0.6-phase5
+Version: 2.0.7-phase6
 """
 
-__version__ = "2.0.6-phase5"
+__version__ = "2.0.7-phase6"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
@@ -288,17 +288,28 @@ class CRRDFReviewApp:
         self.root = root
         self.root.title("Rugby Referee Review System")
         
-        # Set minimum window size
-        self.root.minsize(900, 700)
+        # Set window icon
+        try:
+            # Try to load icon.ico for the window title bar
+            self.root.iconbitmap('icon.ico')
+        except:
+            # If icon file not found, continue without it
+            pass
         
-        # Start with a good default size
-        self.root.geometry("1100x750")
+        # Set minimum window size
+        self.root.minsize(1000, 800)
+        
+        # Start with a good default size for home screen
+        self.root.geometry("1200x850")
         
         # Center window on screen
         self.center_window()
         
         # Allow window to be resizable
         self.root.resizable(True, True)
+        
+        # Bind keyboard shortcuts
+        self.setup_keyboard_shortcuts()
         
         self.session = ReviewSession()
         self.current_pillar = None
@@ -327,8 +338,9 @@ class CRRDFReviewApp:
         # Create menu bar
         self.create_menu_bar()
         
-        # Create main container
+        # Create main container and show home screen
         self.create_widgets()
+        self.show_home_screen()
     
     def get_review_filename(self, referee_name, date):
         """Generate standardized filename for review"""
@@ -446,6 +458,7 @@ class CRRDFReviewApp:
             
             self.create_menu_bar()
             self.create_widgets()
+            self.show_home_screen()
         
         # Buttons
         button_frame = tk.Frame(content, bg="white")
@@ -461,6 +474,7 @@ class CRRDFReviewApp:
     
     def save_review_json(self):
         """Save current review to JSON file"""
+        self.status_saving()
         try:
             # Compile all review data
             review_data = {
@@ -523,6 +537,62 @@ class CRRDFReviewApp:
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f'{width}x{height}+{x}+{y}')
     
+    def setup_keyboard_shortcuts(self):
+        """Setup keyboard shortcuts for common actions"""
+        # Ctrl+H - Home
+        self.root.bind('<Control-h>', lambda e: self.show_home_screen())
+        self.root.bind('<Control-H>', lambda e: self.show_home_screen())
+        
+        # Ctrl+N - New Review
+        self.root.bind('<Control-n>', lambda e: self.new_review())
+        self.root.bind('<Control-N>', lambda e: self.new_review())
+        
+        # Ctrl+B - Browse Reviews
+        self.root.bind('<Control-b>', lambda e: self.browse_reviews())
+        self.root.bind('<Control-B>', lambda e: self.browse_reviews())
+        
+        # Ctrl+Shift+A - Analytics (Shift to avoid Select All conflict)
+        self.root.bind('<Control-Shift-A>', lambda e: self.show_analytics_dashboard())
+        self.root.bind('<Control-Shift-a>', lambda e: self.show_analytics_dashboard())
+        
+        # Ctrl+O - Open Review
+        self.root.bind('<Control-o>', lambda e: self.open_review())
+        self.root.bind('<Control-O>', lambda e: self.open_review())
+        
+        # F1 - About
+        self.root.bind('<F1>', lambda e: self.show_about_dialog())
+        
+        # Ctrl+Q - Quit
+        self.root.bind('<Control-q>', lambda e: self.root.quit())
+        self.root.bind('<Control-Q>', lambda e: self.root.quit())
+    
+    def update_status(self, message):
+        """Update the status bar message"""
+        if hasattr(self, 'status_bar'):
+            self.status_bar.config(text=message)
+            self.root.update_idletasks()
+    
+    def status_ready(self):
+        """Set status to ready"""
+        self.update_status("Ready")
+    
+    def status_loading(self):
+        """Set status to loading"""
+        self.update_status("Loading...")
+    
+    def status_saving(self):
+        """Set status to saving"""
+        self.update_status("Saving...")
+    
+    def status_info(self, count=None):
+        """Show review count in status"""
+        if count is None:
+            try:
+                count = len(list(self.reviews_dir.glob("*.json")))
+            except:
+                count = 0
+        self.update_status(f"Ready  •  {count} reviews saved")
+    
     def create_menu_bar(self):
         """Create the menu bar"""
         menubar = tk.Menu(self.root)
@@ -531,13 +601,15 @@ class CRRDFReviewApp:
         # File menu
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New Review", command=self.new_review)
-        file_menu.add_command(label="Open Review...", command=self.open_review)
-        file_menu.add_command(label="Browse All Reviews...", command=self.browse_reviews)
+        file_menu.add_command(label="Home", command=self.show_home_screen, accelerator="Ctrl+H")
         file_menu.add_separator()
-        file_menu.add_command(label="View Analytics", command=self.show_analytics_dashboard)
+        file_menu.add_command(label="New Review", command=self.new_review, accelerator="Ctrl+N")
+        file_menu.add_command(label="Open Review...", command=self.open_review, accelerator="Ctrl+O")
+        file_menu.add_command(label="Browse All Reviews...", command=self.browse_reviews, accelerator="Ctrl+B")
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.root.quit)
+        file_menu.add_command(label="View Analytics", command=self.show_analytics_dashboard, accelerator="Ctrl+Shift+A")
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit, accelerator="Ctrl+Q")
         
         # Settings menu
         settings_menu = tk.Menu(menubar, tearoff=0)
@@ -547,7 +619,9 @@ class CRRDFReviewApp:
         # Help menu
         help_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Help", menu=help_menu)
-        help_menu.add_command(label="About", command=self.show_about_dialog)
+        help_menu.add_command(label="Report Issue", command=self.open_github_issues)
+        help_menu.add_separator()
+        help_menu.add_command(label="About", command=self.show_about_dialog, accelerator="F1")
     
     def new_review(self):
         """Start a new review"""
@@ -557,6 +631,7 @@ class CRRDFReviewApp:
     
     def open_review(self):
         """Open an existing review"""
+        self.status_loading()
         filename = filedialog.askopenfilename(
             title="Open Review",
             initialdir=self.reviews_dir,
@@ -567,6 +642,8 @@ class CRRDFReviewApp:
             self.clear_content()  # Explicitly clear before loading
             messagebox.showinfo("Success", "Review loaded successfully!")
             self.show_metadata_entry()
+        
+        self.status_ready()
     
     def browse_reviews(self):
         """Show review browser dialog"""
@@ -964,6 +1041,12 @@ class CRRDFReviewApp:
                  font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
                  padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=20)
     
+    def open_github_issues(self):
+        """Open GitHub issues page in browser"""
+        import webbrowser
+        github_url = "https://github.com/agclarkson/ReviewApp/issues"
+        webbrowser.open(github_url)
+    
     def show_personal_settings(self):
         """Show personal settings dialog"""
         settings = tk.Toplevel(self.root)
@@ -1045,6 +1128,149 @@ class CRRDFReviewApp:
                  padx=30, pady=10, relief=tk.FLAT, cursor="hand2",
                  activebackground="#d0d0d0").pack(side=tk.LEFT, padx=5)
     
+    def show_home_screen(self):
+        """Show the home screen with main actions"""
+        # Clear content area
+        self.clear_content()
+        
+        # Update status
+        self.status_info()
+        
+        # Main container
+        home = tk.Frame(self.content, bg="white")
+        home.pack(fill=tk.BOTH, expand=True)
+        
+        # Welcome section
+        welcome_frame = tk.Frame(home, bg="white")
+        welcome_frame.pack(pady=40)
+        
+        # Show icon if we have it (or placeholder)
+        icon_frame = tk.Frame(welcome_frame, bg="white")
+        icon_frame.pack(pady=20)
+        
+        # Create a simple placeholder icon using canvas
+        canvas = tk.Canvas(icon_frame, width=120, height=120, bg="white", highlightthickness=0)
+        canvas.pack()
+        
+        # Draw circle
+        canvas.create_oval(10, 10, 110, 110, fill="#1976D2", outline="#0D47A1", width=3)
+        
+        # Draw text
+        canvas.create_text(60, 60, text="RR", font=("Segoe UI", 36, "bold"), fill="white")
+        
+        # Welcome text
+        user_name = self.config.get("user_name", "")
+        welcome_text = f"Welcome back, {user_name}!" if user_name else "Welcome to Rugby Referee Review System"
+        tk.Label(welcome_frame, text=welcome_text, 
+                font=("Segoe UI", 18, "bold"), bg="white", fg="#212121").pack(pady=10)
+        
+        tk.Label(welcome_frame, text="Track your development with the CRRDF Framework", 
+                font=("Segoe UI", 11), bg="white", fg="#757575").pack()
+        
+        # Action buttons
+        buttons_frame = tk.Frame(home, bg="white")
+        buttons_frame.pack(pady=30)
+        
+        # New Review button
+        new_btn = tk.Button(buttons_frame, text="📝 New Review", 
+                           command=self.show_metadata_entry,
+                           font=("Segoe UI", 14, "bold"), bg="#4CAF50", fg="white",
+                           padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                           activebackground="#45a049")
+        new_btn.pack(pady=10, fill=tk.X)
+        
+        # Browse Reviews button
+        browse_btn = tk.Button(buttons_frame, text="📂 Browse Reviews", 
+                              command=self.browse_reviews,
+                              font=("Segoe UI", 14, "bold"), bg="#2196F3", fg="white",
+                              padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                              activebackground="#1976D2")
+        browse_btn.pack(pady=10, fill=tk.X)
+        
+        # View Analytics button
+        analytics_btn = tk.Button(buttons_frame, text="📊 View Analytics", 
+                                 command=self.show_analytics_dashboard,
+                                 font=("Segoe UI", 14, "bold"), bg="#FF9800", fg="white",
+                                 padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                                 activebackground="#F57C00")
+        analytics_btn.pack(pady=10, fill=tk.X)
+        
+        # Stats and recent reviews section
+        info_frame = tk.Frame(home, bg="#F5F5F5")
+        info_frame.pack(fill=tk.X, padx=40, pady=20)
+        
+        # Quick stats
+        stats_frame = tk.Frame(info_frame, bg="#F5F5F5")
+        stats_frame.pack(pady=15)
+        
+        try:
+            # Count reviews
+            json_files = list(self.reviews_dir.glob("*.json"))
+            total_reviews = len(json_files)
+            
+            if total_reviews > 0:
+                # Get latest review date
+                latest_file = max(json_files, key=lambda p: p.stat().st_mtime)
+                try:
+                    with open(latest_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        latest_date = data.get('metadata', {}).get('date', 'Unknown')
+                except:
+                    latest_date = 'Unknown'
+                
+                tk.Label(stats_frame, text=f"📈 {total_reviews} Reviews Completed", 
+                        font=("Segoe UI", 11, "bold"), bg="#F5F5F5", fg="#212121").pack(side=tk.LEFT, padx=20)
+                tk.Label(stats_frame, text=f"📅 Latest: {latest_date}", 
+                        font=("Segoe UI", 11), bg="#F5F5F5", fg="#757575").pack(side=tk.LEFT, padx=20)
+            else:
+                tk.Label(stats_frame, text="🎯 Start your first review to track your progress!", 
+                        font=("Segoe UI", 11), bg="#F5F5F5", fg="#757575").pack()
+        except:
+            tk.Label(stats_frame, text="Ready to start tracking your development", 
+                    font=("Segoe UI", 11), bg="#F5F5F5", fg="#757575").pack()
+        
+        # Recent reviews list
+        recent_frame = tk.Frame(info_frame, bg="#F5F5F5")
+        recent_frame.pack(pady=10, padx=20, fill=tk.BOTH, expand=True)
+        
+        tk.Label(recent_frame, text="Recent Reviews:", 
+                font=("Segoe UI", 11, "bold"), bg="#F5F5F5", fg="#212121", anchor="w").pack(fill=tk.X, pady=(5, 10))
+        
+        try:
+            json_files = sorted(self.reviews_dir.glob("*.json"), 
+                              key=lambda p: p.stat().st_mtime, reverse=True)[:5]
+            
+            if json_files:
+                for filepath in json_files:
+                    try:
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                            date = data.get('metadata', {}).get('date', 'Unknown')
+                            grade = data.get('metadata', {}).get('game_grade', 'Unknown')
+                            
+                            review_frame = tk.Frame(recent_frame, bg="white", relief=tk.RAISED, bd=1)
+                            review_frame.pack(fill=tk.X, pady=2)
+                            
+                            review_btn = tk.Button(review_frame, 
+                                                  text=f"  • {date} - {grade}", 
+                                                  font=("Segoe UI", 10), bg="white", fg="#212121",
+                                                  anchor="w", relief=tk.FLAT, cursor="hand2",
+                                                  command=lambda f=filepath: self.load_review_from_home(f))
+                            review_btn.pack(fill=tk.X, padx=10, pady=5)
+                    except:
+                        pass
+            else:
+                tk.Label(recent_frame, text="No reviews yet. Click 'New Review' to get started!", 
+                        font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(fill=tk.X)
+        except:
+            tk.Label(recent_frame, text="No reviews found", 
+                    font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(fill=tk.X)
+    
+    def load_review_from_home(self, filepath):
+        """Load a review from the home screen recent list"""
+        if self.load_review_json(filepath):
+            self.show_metadata_entry()
+    
     def create_widgets(self):
         """Create the main UI"""
         # Header with modern color
@@ -1060,6 +1286,11 @@ class CRRDFReviewApp:
         subtitle = tk.Label(header, text="Based on CRRDF Framework  •  © 2025 Andrew Clarkson", 
                            font=("Segoe UI", 9), bg="#1976D2", fg="#E3F2FD")
         subtitle.pack()
+        
+        # Status bar at bottom
+        self.status_bar = tk.Label(self.root, text="Ready", bd=1, relief=tk.SUNKEN, anchor=tk.W,
+                                   font=("Segoe UI", 9), bg="#F5F5F5", fg="#757575", padx=10, pady=3)
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
         
         # Main content area
         self.content = tk.Frame(self.root, bg="#FAFAFA")
@@ -1591,6 +1822,10 @@ class CRRDFReviewApp:
                 messagebox.showinfo("Success", f"Review exported successfully!\n\nExcel: {filename}\nJSON: {json_filename}")
             else:
                 messagebox.showinfo("Success", f"Review exported successfully to:\n{filename}")
+            
+            # Return to home screen after successful save
+            self.show_home_screen()
+            
         except Exception as e:
             messagebox.showerror("Export Error", f"Failed to export:\n{str(e)}")
     
