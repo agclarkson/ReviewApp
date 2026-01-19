@@ -45,9 +45,9 @@
 ┌─────────────────────────────────────────────────────────────┐
 │  GITHUB: Creates Release with 3 Download Files             │
 │                                                              │
-│  ✓ orra-referee-review-windows.zip                         │
-│  ✓ orra-referee-review-macos.zip                           │
-│  ✓ orra-referee-review-linux.tar.gz                        │
+│  ✓ referee-review-windows.zip                         │
+│  ✓ referee-review-macos.zip                           │
+│  ✓ referee-review-linux.tar.gz                        │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼

@@ -13,7 +13,7 @@ Licensed under MIT License
 Version: 2.0.7-phase6
 """
 
-__version__ = "2.0.7-phase6"
+__version__ = "2.0.8-alpha"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"

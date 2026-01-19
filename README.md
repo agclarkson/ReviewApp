@@ -1,61 +1,140 @@
 # Rugby Referee Review System
 
-**Version 2.0.6** | Professional referee performance tracking based on the CRRDF Framework
+A desktop application for rugby referees to track their development using the Community Rugby Referee Development Framework (CRRDF).
 
-Copyright © 2025 Andrew Clarkson | MIT License
-
----
-
-## 🏉 What is This?
-
-The Rugby Referee Review System is a professional desktop application designed to help rugby referees track their development using the Community Rugby Referee Development Framework (CRRDF).
-
-**Key Features:**
-- ✅ Complete CRRDF implementation (5 pillars, guided reflection)
-- ✅ GFA performance tracking (10 categories)
-- ✅ Personal setup with auto-fill
-- ✅ Analytics dashboard with performance trends
-- ✅ Review history browser with search
-- ✅ Professional Excel export
-- ✅ Multi-platform (Windows, Mac, Linux)
+**Version:** 2.0.8-alpha  
+**License:** MIT  
+**Author:** Andrew Clarkson
 
 ---
 
-## 🚀 Quick Start
+## Overview
 
-### First Time Setup:
-1. **Launch the application**
-2. **Welcome screen appears** - Enter your name and coach (optional)
-3. **Click "Get Started"**
-4. You're ready to go!
+This application helps rugby referees systematically review their performances and track improvement over time. Built around the CRRDF framework, it provides structured reflection prompts, performance scoring, and visual analytics.
 
-### Creating Your First Review:
-1. **Game Information** - Select grade from dropdown, use "Today" button for date
-2. **Self Reflection** - Answer the general reflection questions
-3. **CRRDF Pillars** - Work through each of the 5 pillars
-4. **GFA Performance** - Rate yourself in 10 key areas
-5. **Coach Feedback** - Add notes from your coach
-6. **Save & Export** - Creates Excel file and auto-saves for history
+## Features
 
-### Viewing Your Progress:
-- **File → View Analytics** - See performance trends and statistics
-- **File → Browse All Reviews** - Access your complete history
-- **Settings → Personal Info** - Update your name/coach
+### Review Creation
+- Structured self-reflection across five CRRDF pillars
+- GFA performance scoring (10 categories, 1-5 scale)
+- Game metadata tracking (date, grade, result)
+- Coach feedback section
+- Excel export for sharing and archiving
 
----
+### Performance Tracking
+- Analytics dashboard with trend visualization
+- Review history with search functionality
+- Quick access to recent reviews
+- Progress statistics
 
-## 📊 Features in Detail
+### User Experience
+- Personal setup on first run (auto-fill referee/coach names)
+- Keyboard shortcuts for navigation
+- Status bar feedback
+- Home screen with action overview
 
-### CRRDF Framework (5 Pillars)
-The app guides you through structured reflection on:
+## Installation
+
+### Requirements
+- Windows 10+, macOS 10.14+, or Ubuntu 20.04+
+- No additional dependencies for binary releases
+
+### Download
+Get the latest release for your platform:
+- **Windows:** Extract ZIP, run `Rugby Referee Review.exe`
+- **macOS:** Extract ZIP, run `Rugby Referee Review`
+- **Linux:** Extract tarball, run `rugby-referee-review`
+
+### First Run
+On first launch, you'll enter:
+- Your full name (auto-fills in reviews)
+- Preferred coach name (optional)
+
+This information can be updated later via Settings → Personal Info.
+
+## Usage
+
+### Creating a Review
+
+1. **Home Screen:** Click "New Review" or press Ctrl+N
+2. **Game Information:** Enter date, grade, result
+3. **Self Reflection:** Answer general reflection questions
+4. **CRRDF Pillars:** Work through 5 pillars (Technical, Tactical, Management, Mental, Physical)
+5. **GFA Performance:** Rate yourself in 10 key areas
+6. **Coach Feedback:** Add notes from your coach
+7. **Save & Export:** Generates Excel file and saves JSON for history
+
+### Viewing Analytics
+
+Access via home screen or File → View Analytics (Ctrl+Shift+A)
+
+Displays:
+- Total review count and date range
+- GFA score trends over time
+- Performance statistics
+- Recent review summary
+
+### Managing Reviews
+
+**Browse Reviews** (Ctrl+B):
+- View all saved reviews
+- Search by name, date, or grade
+- Load existing reviews to edit
+- Delete unwanted reviews
+
+**Recent Reviews:**
+Quick access to your last 5 reviews from the home screen
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+H | Home screen |
+| Ctrl+N | New review |
+| Ctrl+O | Open review |
+| Ctrl+B | Browse reviews |
+| Ctrl+Shift+A | Analytics |
+| F1 | About |
+| Ctrl+Q | Quit |
+
+## Data Storage
+
+**Reviews:** `Documents/RugbyRefereeReviews/`
+- Format: JSON (for app) + Excel (for export)
+- Filename: `Review_[Name]_[Date].json`
+
+**Settings:** `~/.rugby_referee_review_config.json`
+- Contains name, coach, and preferences
+- Can be deleted to reset first-run setup
+
+## Game Grades
+
+Currently configured for Otago region:
+- Division 1, 2, 3
+- Southern Premier, Central Premier
+- Women's Division 1, 2
+- Premier 1st XV
+- U20 Colts, U21 Colts Division 1, 2
+- High School
+- Other
+
+To customize for your region, edit the `GAME_GRADES` list in the source code (future versions will support UI configuration).
+
+## CRRDF Framework
+
+The Community Rugby Referee Development Framework structures development across five pillars:
+
 1. **Technical** - Law application, decision accuracy
 2. **Tactical** - Game management, positioning
-3. **Management** - Player management, communication
+3. **Management** - Player interactions, communication
 4. **Mental** - Confidence, focus, resilience
 5. **Physical** - Fitness, positioning, stamina
 
-### GFA Performance Tracking
-Rate yourself 1-5 in 10 key areas:
+Each pillar includes guided reflection questions to encourage systematic improvement.
+
+## GFA Performance Areas
+
+Game, Form & Appearance scoring covers:
 - Game Management
 - Communication & Signals
 - Advantage Application
@@ -67,176 +146,96 @@ Rate yourself 1-5 in 10 key areas:
 - Offside Lines
 - Penalty Decisions
 
-### Analytics Dashboard
-- **Performance trends** over time
-- **Visual charts** showing improvement
-- **Statistics** - total reviews, date ranges, averages
-- **Recent reviews** table
+Ratings: 1 (Unsatisfactory) to 5 (Excellent)
 
-### Review History
-- **Browse all reviews** - Sorted by date
-- **Search** - Filter by name, date, or grade
-- **Load reviews** - View or edit past reviews
-- **Delete reviews** - Clean up old data
-
----
-
-## 💾 Data Storage
-
-### Your Reviews:
-Saved to: `Documents/RugbyRefereeReviews/`
-- Each review saved as JSON (for app use)
-- Excel exports saved wherever you choose
-
-### Your Settings:
-Config file: `~/.rugby_referee_review_config.json`
-- Contains your name and coach preference
-- Auto-fills future reviews
-
----
-
-## 🎯 Game Grades
-
-Currently configured with Otago region grades:
-- Division 1, 2, 3
-- Southern Premier
-- Central Premier
-- Women's Division 1, 2
-- Premier 1st XV
-- U20 Colts
-- U21 Colts Division 1, 2
-- High School
-- Other
-
-*Future versions will support regional customization*
-
----
-
-## ⚙️ Settings & Preferences
-
-### Personal Information
-**Settings → Personal Info**
-- Update your full name
-- Update preferred coach name
-- Changes apply to all future reviews
-
-### Data Management
-- Reviews auto-save as JSON
-- Export to Excel anytime
-- Load previous reviews to edit
-- Delete unwanted reviews
-
----
-
-## 📖 Tips for Best Results
-
-### Regular Reviews:
-- Complete reviews within 24 hours of the game
-- Be honest in your self-reflection
-- Use specific examples in your answers
-
-### Track Progress:
-- Check analytics monthly to see trends
-- Compare similar grade games
-- Identify consistent strengths/weaknesses
-
-### Use for Development:
-- Share Excel exports with your coach
-- Review before promotion applications
-- Track improvement over seasons
-
----
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Windows Security Warning
-**"Windows protected your PC"**
-- Click "More info"
-- Click "Run anyway"
-- This is normal for apps without code signing certificates
+Windows Defender may show "Unknown Publisher" for unsigned applications.
+- Click "More info" → "Run anyway"
+- This is standard for open-source software without code signing certificates
 
-### Antivirus Detection
-Some antivirus software may flag the app as suspicious:
-- This is a false positive
-- The app is safe - it's open source
-- Add exception if needed
+### Antivirus False Positives
+Some antivirus software may flag PyInstaller-built executables.
+- This is a known issue with PyInstaller
+- Add an exception if needed
+- Source code is available for inspection
 
-### Review Won't Load
+### Reviews Won't Load
 - Check file isn't corrupted
-- Ensure it's a valid JSON file from this app
+- Ensure it's a valid JSON file from this application
 - Try opening a different review
 
-### Analytics Not Showing
-- Need at least one completed review
-- Check `Documents/RugbyRefereeReviews/` folder exists
-- Ensure reviews have GFA scores
+### Analytics Not Displaying
+- Requires at least one completed review
+- Verify reviews saved to correct directory
+- Check GFA scores are present in reviews
+
+### Icon Not Showing
+If the window icon doesn't appear, ensure `icon.ico` exists in the application directory (should be bundled automatically).
+
+## Development
+
+### Building from Source
+
+**Requirements:**
+```bash
+pip install openpyxl ttkbootstrap pillow matplotlib
+```
+
+**Run:**
+```bash
+python referee_review_app.py
+```
+
+**Build Executable:**
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed --name "Rugby Referee Review" --icon icon.ico --add-data "icon.ico;." referee_review_app.py
+```
+
+### Project Structure
+```
+ReviewApp/
+├── referee_review_app.py    # Main application
+├── icon.ico                  # Windows icon
+├── icon.iconset/             # macOS icon
+├── icon_512.png              # Linux icon
+├── requirements.txt          # Python dependencies
+├── README.md                 # This file
+├── QUICK_START.md            # Quick reference guide
+└── .github/
+    └── workflows/
+        └── build-releases.yml # CI/CD configuration
+```
+
+### Contributing
+
+Issues and feature requests: [GitHub Issues](https://github.com/agclarkson/ReviewApp/issues)
+
+When reporting bugs, include:
+- Operating system and version
+- Steps to reproduce
+- Expected vs actual behavior
+- Screenshots if applicable
+
+## Roadmap
+
+Future enhancements under consideration:
+- Regional grade configuration via UI
+- PDF export option
+- Review comparison tool
+- Goal tracking system
+- Multi-language support
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Acknowledgments
+
+Based on the Community Rugby Referee Development Framework (CRRDF).
 
 ---
 
-## 🆘 Support
-
-### Found a Bug?
-- Note what you were doing when it happened
-- Check if it's reproducible
-- Contact the developer with details
-
-### Feature Request?
-- Contact the developer
-- Describe the feature and why it would help
-
-### Questions?
-- Check this README first
-- Review the QUICK_START guide
-- Contact the developer
-
----
-
-## 📜 License & Credits
-
-**License:** MIT License
-**Copyright:** © 2025 Andrew Clarkson
-**Framework:** Based on Community Rugby Referee Development Framework (CRRDF)
-
-### Open Source
-This software is open source and free to use. No warranty is provided.
-
----
-
-## 🔄 Version History
-
-**v2.0.6 (Current)**
-- Personal setup and auto-fill
-- Settings menu
-- Improved dialogs
-
-**v2.0.5**
-- Analytics dashboard
-- Performance charts
-- Statistics overview
-
-**v2.0.4**
-- Review history browser
-- Search and filter
-- Auto-save JSON
-
-**v2.0.3**
-- Splash screen
-- Menu bar
-- Professional UI
-
-**v2.0.0**
-- Initial CRRDF implementation
-- GFA tracking
-- Excel export
-
----
-
-## 🙏 Acknowledgments
-
-Thank you to:
-- The referee community for feedback
-- All testers and early adopters
-
----
-
-**Enjoy tracking your development!** 🏉✨
+**For questions or support:** Open an issue on GitHub or contact the developer.

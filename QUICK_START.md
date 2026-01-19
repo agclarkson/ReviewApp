@@ -1,181 +1,198 @@
 # Quick Start Guide
-## Rugby Referee Review System
+
+Get up and running with Rugby Referee Review System in 5 minutes.
 
 ---
 
-## 🎯 First Time Setup (1 minute)
+## First Time Setup
 
-1. **Launch the app** - Double-click the executable
-2. **Welcome screen appears**
-   - Enter your full name
-   - Enter your coach's name (optional)
-   - Click "Get Started"
-3. **Done!** Your name will auto-fill in every review
+1. **Download and extract** the application for your platform
+2. **Run the application**
+3. **Welcome screen:** Enter your name and optional coach name
+4. **Click "Get Started"**
+
+Done! You're ready to create reviews.
 
 ---
 
-## ✍️ Creating a Review (5-10 minutes)
+## Creating Your First Review
 
-### Step 1: Game Information
-- **Game & Grade:** Select from dropdown
-- **Date:** Click "Today" or type YYYY-MM-DD
-- **Result:** e.g., "Home 24-17 Away"
-- **Referee:** (Auto-filled with your name)
-- **Coach:** (Auto-filled if you set one)
+### Step 1: Game Information (30 seconds)
+- Select game grade from dropdown
+- Click "Today" for current date or enter manually (YYYY-MM-DD)
+- Enter result (e.g., "Home 24-17 Away")
+- Your name auto-fills from setup
+- Click "Next: Self Reflection"
 
-Click **Next: Self Reflection** →
-
-### Step 2: Self Reflection
-Answer 3 general questions:
-1. What went well?
+### Step 2: Self Reflection (2-3 minutes)
+Answer three questions:
+1. What went well in this game?
 2. What could be improved?
-3. Key learnings?
+3. What are the key learnings?
 
-Click **Next: CRRDF Deep Dive** →
+Click "Next: CRRDF Deep Dive"
 
-### Step 3: CRRDF Pillars
-Work through **5 pillars**, each with 3 questions:
-1. **Technical** - Laws and decisions
-2. **Tactical** - Game management
-3. **Management** - Player interactions
-4. **Mental** - Mindset and focus
-5. **Physical** - Fitness and positioning
+### Step 3: CRRDF Pillars (5-10 minutes)
+Work through five pillars, answering three questions each:
+- Technical
+- Tactical
+- Management
+- Mental
+- Physical
 
-For each pillar:
-- Answer the 3 questions thoughtfully
-- Click **Next Pillar** to continue
-- Use **← Previous Pillar** if needed
+Use "Next Pillar" to continue, "Previous Pillar" to go back.
 
-### Step 4: GFA Performance
-Rate yourself 1-5 in **10 areas**:
+### Step 4: GFA Performance (2-3 minutes)
+Rate yourself 1-5 in ten areas:
 - 1 = Unsatisfactory
 - 2 = Development Needed
 - 3 = Satisfactory
 - 4 = Sound
 - 5 = Excellent
 
-### Step 5: Coach Feedback
-Add any notes from your coach's review
+### Step 5: Coach Feedback (1 minute)
+Add notes from your coach's review.
 
 ### Step 6: Save & Export
-Click **Save & Export to Excel**
-- Choose where to save Excel file
-- Review automatically saved to history
+Click "Save & Export to Excel"
+- Choose save location for Excel file
+- Review auto-saves to history
+- Returns to home screen
 
-**Done!** 🎉
-
----
-
-## 📊 Viewing Analytics (30 seconds)
-
-1. **File → View Analytics**
-2. See your:
-   - Total reviews
-   - GFA trends over time
-   - Recent performance
-   - Statistics
-
-Close when done!
+**Total time: 10-20 minutes per review**
 
 ---
 
-## 📂 Finding Past Reviews (30 seconds)
+## Keyboard Shortcuts
 
-### Quick Browse:
-1. **File → Browse All Reviews**
-2. See all reviews sorted by date
-3. **Search:** Type to filter
-4. **Load:** Double-click or click Load button
-5. **Delete:** Select and click Delete
+Speed up your workflow:
 
-### Edit a Review:
-1. Load the review
-2. Make changes
-3. Save & Export again
-
----
-
-## ⚙️ Updating Your Info (30 seconds)
-
-1. **Settings → Personal Info**
-2. Update name or coach
-3. Click **Save Changes**
-4. Future reviews use new info
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+H | Home |
+| Ctrl+N | New Review |
+| Ctrl+B | Browse Reviews |
+| Ctrl+Shift+A | Analytics |
+| Ctrl+O | Open Review |
+| F1 | About |
+| Ctrl+Q | Quit |
 
 ---
 
-## 💡 Tips
+## Viewing Your Progress
 
-### For Best Results:
-- ✅ Complete reviews within 24 hours
-- ✅ Be honest and specific
-- ✅ Use concrete examples
-- ✅ Review analytics monthly
+### Analytics Dashboard
+1. Click "View Analytics" from home screen or press Ctrl+Shift+A
+2. See:
+   - Total review count
+   - GFA score trends over time
+   - Recent performance summary
 
-### Keyboard Shortcuts:
-- **Enter** - Submit welcome screen
-- **Tab** - Move between fields
-- **Esc** - Close dialogs
-
-### Data Locations:
-- **Reviews:** `Documents/RugbyRefereeReviews/`
-- **Config:** `~/.rugby_referee_review_config.json`
+### Review History
+1. Click "Browse Reviews" or press Ctrl+B
+2. Search by name, date, or grade
+3. Double-click or click "Load" to open
+4. Edit and re-save if needed
 
 ---
 
-## ❓ Common Questions
+## Tips for Best Results
 
-**Q: Do I need internet?**
-A: No! Works completely offline.
+### During Reviews
+- Complete within 24 hours of the game
+- Be specific with examples
+- Be honest about areas for improvement
+- Focus on actionable insights
 
-**Q: Can I edit old reviews?**
-A: Yes! File → Browse All Reviews → Load
+### Regular Practice
+- Review after every game
+- Check analytics monthly
+- Track improvement trends
+- Share Excel exports with coaches
 
-**Q: Where are my reviews saved?**
-A: `Documents/RugbyRefereeReviews/` as JSON files
-
-**Q: Can I export multiple reviews?**
-A: Not yet - one at a time for now
-
-**Q: How do I backup my data?**
-A: Copy the `RugbyRefereeReviews` folder
-
-**Q: Can I change game grades?**
-A: Not in the UI yet - contact developer
-
-**Q: Why the Windows warning?**
-A: App isn't code-signed. Click "More info" → "Run anyway"
+### Organization
+- Reviews save automatically to `Documents/RugbyRefereeReviews/`
+- Excel files saved wherever you choose
+- Use consistent date format (YYYY-MM-DD)
+- Name included in filename for easy identification
 
 ---
 
-## 🆘 Need Help?
+## Common Tasks
 
-### App Won't Start:
-- Check you have the right version for your OS
-- Try restarting your computer
-- Disable antivirus temporarily
+### Update Your Name
+1. Settings → Personal Info
+2. Change name or coach
+3. Click "Save Changes"
+4. Future reviews use new information
 
-### Review Won't Save:
-- Check disk space
-- Ensure `Documents` folder is accessible
-- Try a different location for Excel
+### Open a Previous Review
+1. Home screen → Click recent review, or
+2. Browse Reviews → Find and load, or
+3. File → Open Review → Navigate to JSON file
 
-### Analytics Empty:
-- Need at least 1 completed review
-- Check reviews saved to correct folder
-- Try creating a new review
+### Delete a Review
+1. Browse Reviews
+2. Select review
+3. Click "Delete"
+4. Confirm deletion
 
-### Still Stuck?
-Contact the developer or check the full README
-
----
-
-## 🚀 You're Ready!
-
-Start your first review and track your development journey!
-
-**Remember:** The more detailed your reflections, the more useful the app becomes for tracking your growth as a referee.
+### Find Specific Reviews
+1. Browse Reviews
+2. Type in search box
+3. Filters by referee name, date, or grade
+4. Updates as you type
 
 ---
 
-**Good luck with your games!** 🏉
+## Data Location
+
+**Reviews:** `Documents/RugbyRefereeReviews/`
+- JSON files for app use
+- Named: `Review_[Name]_[Date].json`
+
+**Exports:** Wherever you choose when saving Excel
+
+**Settings:** `~/.rugby_referee_review_config.json`
+
+---
+
+## Troubleshooting
+
+### App Won't Open (Windows)
+Click "More info" → "Run anyway" on Windows security warning
+
+### Can't Find My Reviews
+Check `Documents/RugbyRefereeReviews/` folder
+
+### Analytics Empty
+Need at least one saved review with GFA scores
+
+### Review Won't Load
+Ensure file hasn't been manually edited or corrupted
+
+### Want to Reset Setup
+Delete `~/.rugby_referee_review_config.json` and restart app
+
+---
+
+## Getting Help
+
+**Report Issues:** Help → Report Issue (opens GitHub)
+
+**Need Support:** Check README.md for detailed documentation
+
+---
+
+## What's Next?
+
+Once you're comfortable:
+- Explore keyboard shortcuts
+- Track trends in analytics
+- Compare reviews over time
+- Share exports with coaching staff
+- Set development goals based on data
+
+---
+
+**Remember:** Consistent review practice leads to consistent improvement. Make it part of your post-game routine!
