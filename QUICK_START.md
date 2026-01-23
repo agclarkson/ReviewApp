@@ -1,198 +1,184 @@
-# Quick Start Guide
+# Quick Start Guide - Alpha 2
 
-Get up and running with Rugby Referee Review System in 5 minutes.
-
----
-
-## First Time Setup
-
-1. **Download and extract** the application for your platform
-2. **Run the application**
-3. **Welcome screen:** Enter your name and optional coach name
-4. **Click "Get Started"**
-
-Done! You're ready to create reviews.
+Rugby Referee Review System v2.1.0-alpha2
 
 ---
 
-## Creating Your First Review
+## First Time (1 minute)
 
-### Step 1: Game Information (30 seconds)
-- Select game grade from dropdown
-- Click "Today" for current date or enter manually (YYYY-MM-DD)
-- Enter result (e.g., "Home 24-17 Away")
-- Your name auto-fills from setup
-- Click "Next: Self Reflection"
+1. **Launch app** - Double-click executable
+2. **Welcome screen** - Enter name & coach
+3. **Home screen** - Choose your action!
 
-### Step 2: Self Reflection (2-3 minutes)
-Answer three questions:
-1. What went well in this game?
-2. What could be improved?
-3. What are the key learnings?
+---
 
-Click "Next: CRRDF Deep Dive"
+## Creating a Review (10-20 minutes)
 
-### Step 3: CRRDF Pillars (5-10 minutes)
-Work through five pillars, answering three questions each:
-- Technical
-- Tactical
-- Management
-- Mental
-- Physical
+### Workflow:
+1. Click "📝 New Review" (or Ctrl+N)
+2. Fill in game details → Click "Next"
+3. Self reflection (3 questions) → "Next"
+4. CRRDF pillars (5 pillars, 3 questions each) → "Next Pillar"
+5. GFA scores (rate 1-5) → "Next"
+6. Coach feedback → "Save & Export"
 
-Use "Next Pillar" to continue, "Previous Pillar" to go back.
+### Tips:
+- **Tab** moves between fields
+- **Enter** clicks focused buttons
+- No mouse needed!
 
-### Step 4: GFA Performance (2-3 minutes)
-Rate yourself 1-5 in ten areas:
-- 1 = Unsatisfactory
-- 2 = Development Needed
-- 3 = Satisfactory
-- 4 = Sound
-- 5 = Excellent
+---
 
-### Step 5: Coach Feedback (1 minute)
-Add notes from your coach's review.
+## Creating Your IDP (30-60 minutes)
 
-### Step 6: Save & Export
-Click "Save & Export to Excel"
-- Choose save location for Excel file
-- Review auto-saves to history
-- Returns to home screen
+### Workflow:
+1. Click "📋 Create Development Plan" (or Ctrl+D)
+2. Work through 9 sections:
+   - Club level (current status)
+   - Representative (rep involvement)
+   - Aspirations (goals)
+   - Fitness (plan & targets)
+   - Law (development)
+   - Mental (resilience)
+   - Focus Area 1 (SMART goal)
+   - Focus Area 2 (SMART goal)
+   - Focus Area 3 (SMART goal)
+3. Save draft anytime
+4. Complete & Export to Word
 
-**Total time: 10-20 minutes per review**
+### Tips:
+- Answer thoughtfully - these guide your development
+- Use examples provided in help text
+- Make goals SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+- Save draft often
 
 ---
 
 ## Keyboard Shortcuts
 
-Speed up your workflow:
-
-| Shortcut | Action |
-|----------|--------|
+| Key | Action |
+|-----|--------|
+| **Tab** | Next field |
+| **Enter** | Click button |
 | Ctrl+H | Home |
 | Ctrl+N | New Review |
-| Ctrl+B | Browse Reviews |
+| Ctrl+D | Dev Plan |
+| Ctrl+B | Browse |
 | Ctrl+Shift+A | Analytics |
-| Ctrl+O | Open Review |
-| F1 | About |
-| Ctrl+Q | Quit |
 
 ---
 
 ## Viewing Your Progress
 
-### Analytics Dashboard
-1. Click "View Analytics" from home screen or press Ctrl+Shift+A
-2. See:
-   - Total review count
-   - GFA score trends over time
-   - Recent performance summary
+### Analytics:
+- Ctrl+Shift+A or click "📊 View Analytics"
+- See GFA trends, stats, recent reviews
 
-### Review History
-1. Click "Browse Reviews" or press Ctrl+B
-2. Search by name, date, or grade
-3. Double-click or click "Load" to open
-4. Edit and re-save if needed
+### Browse Reviews:
+- Ctrl+B or click "📂 Browse Reviews"
+- Search, load, edit, delete
+
+### Recent Reviews:
+- Last 5 shown on home screen
+- Click to open directly
 
 ---
 
-## Tips for Best Results
+## Editing Your IDP
 
-### During Reviews
-- Complete within 24 hours of the game
-- Be specific with examples
-- Be honest about areas for improvement
-- Focus on actionable insights
-
-### Regular Practice
-- Review after every game
-- Check analytics monthly
-- Track improvement trends
-- Share Excel exports with coaches
-
-### Organization
-- Reviews save automatically to `Documents/RugbyRefereeReviews/`
-- Excel files saved wherever you choose
-- Use consistent date format (YYYY-MM-DD)
-- Name included in filename for easy identification
+1. Home → "📋 Edit Development Plan"
+2. Navigate to section you want to update
+3. Make changes
+4. Save & re-export
 
 ---
 
 ## Common Tasks
 
-### Update Your Name
-1. Settings → Personal Info
-2. Change name or coach
-3. Click "Save Changes"
-4. Future reviews use new information
+### Update Name/Coach:
+Settings → Personal Info → Save Changes
 
-### Open a Previous Review
-1. Home screen → Click recent review, or
-2. Browse Reviews → Find and load, or
-3. File → Open Review → Navigate to JSON file
+### Delete a Review:
+Browse Reviews → Select → Delete → Confirm
 
-### Delete a Review
-1. Browse Reviews
-2. Select review
-3. Click "Delete"
-4. Confirm deletion
+### Find Specific Review:
+Browse Reviews → Type in search box
 
-### Find Specific Reviews
-1. Browse Reviews
-2. Type in search box
-3. Filters by referee name, date, or grade
-4. Updates as you type
+### Export IDP:
+Complete IDP → Export to Word → Choose location
 
 ---
 
-## Data Location
+## Data Locations
 
-**Reviews:** `Documents/RugbyRefereeReviews/`
-- JSON files for app use
-- Named: `Review_[Name]_[Date].json`
-
-**Exports:** Wherever you choose when saving Excel
-
-**Settings:** `~/.rugby_referee_review_config.json`
+**Reviews:** `Documents/RugbyRefereeReviews/*.json`
+**IDP:** `Documents/RugbyRefereeReviews/idp.json`
+**Config:** `~/.rugby_referee_review_config.json`
 
 ---
 
 ## Troubleshooting
 
-### App Won't Open (Windows)
-Click "More info" → "Run anyway" on Windows security warning
+**App won't open (Windows):**
+"More info" → "Run anyway"
 
-### Can't Find My Reviews
-Check `Documents/RugbyRefereeReviews/` folder
+**Can't find reviews:**
+Check `Documents/RugbyRefereeReviews/`
 
-### Analytics Empty
-Need at least one saved review with GFA scores
+**Scrolling not working:**
+Use mouse wheel in text area
 
-### Review Won't Load
-Ensure file hasn't been manually edited or corrupted
+**IDP won't export:**
+Ensure enough disk space
 
-### Want to Reset Setup
-Delete `~/.rugby_referee_review_config.json` and restart app
+**Need to reset:**
+Delete `~/.rugby_referee_review_config.json`
 
 ---
 
-## Getting Help
+## Tips for Success
 
-**Report Issues:** Help → Report Issue (opens GitHub)
+### Reviews:
+- Complete within 24 hours of game
+- Be specific with examples
+- Use Tab/Enter for speed
+- Check analytics monthly
 
-**Need Support:** Check README.md for detailed documentation
+### IDP:
+- Be honest in self-assessment
+- Make goals measurable
+- Review and update quarterly
+- Share Word export with coach
+
+### Keyboard Workflow:
+- Tab through all fields
+- Enter to click buttons
+- Ctrl+shortcuts for navigation
+- Much faster than mouse!
+
+---
+
+## Alpha Testing
+
+**Please report:**
+- IDP workflow issues
+- Keyboard navigation problems
+- Any crashes or bugs
+
+**How:** Help → Report Issue in app
 
 ---
 
 ## What's Next?
 
-Once you're comfortable:
-- Explore keyboard shortcuts
-- Track trends in analytics
+After using for a while:
+- Link reviews to IDP goals
+- Track progress toward focus areas
+- Set quarterly IDP checkpoints
 - Compare reviews over time
-- Share exports with coaching staff
-- Set development goals based on data
 
 ---
 
-**Remember:** Consistent review practice leads to consistent improvement. Make it part of your post-game routine!
+**Questions?** Check README.md or report an issue!
+
+**Copyright © 2025 Andrew Clarkson**
