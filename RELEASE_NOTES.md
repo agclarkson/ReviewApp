@@ -1,189 +1,207 @@
-# Rugby Referee Review System v2.0.8-alpha
+# Rugby Referee Review System v2.1.0-alpha2
 
-## Alpha Release
+## 🎯 Individual Development Plan Feature + UI Improvements
 
-This is an alpha release for testing and feedback. The application is functional and ready for real-world use, but may contain bugs or rough edges.
+Alpha Release 2 introduces a complete **Individual Development Plan (IDP)** builder and significant keyboard navigation improvements!
 
-### What's Included
+### ✨ What's New in Alpha 2:
+
+**📋 Individual Development Plan (IDP)**
+- **Guided IDP wizard** with 9 sections
+- Thoughtful questions that prompt reflection and goal-setting
+- Section-by-section navigation with progress tracking
+- **SMART goal guidance** for 3 key focus areas
+- Auto-save to JSON
+- **Export to Word** matching ORRA template format
+- Edit existing IDP anytime
+- Separate from reviews (not counted in stats)
+
+**⌨️ Keyboard Navigation**
+- **Tab key** now moves between text fields (no more tab characters!)
+- **Enter key** activates focused buttons
+- Complete keyboard workflow - no mouse needed
+- Works in both reviews and IDP
+
+**🖥️ Window Improvements**
+- App now opens **maximized** (fullscreen)
+- All content visible without resizing
+- Better use of screen space
+
+**🐛 Bug Fixes**
+- Fixed IDP count appearing in review statistics
+- Fixed initialization order crash
+- Added mousewheel scrolling to IDP wizard
+- Icon now displays in window title bar and taskbar
+
+### IDP Sections:
+
+**Current Reality (3 sections):**
+1. **Club Level** - Your current club status and goals
+2. **Representative** - Rep involvement and aspirations  
+3. **Aspirations** - Ultimate goals and this season's targets
+
+**The How (3 sections):**
+4. **Fitness** - Fitness level, Bronco targets, training plan
+5. **Law** - Confidence, weak areas, development plan
+6. **Mental** - Strengths, challenges, resilience building
+
+**Focus Areas (3 sections):**
+7-9. **Three SMART Goals** - Specific, measurable development targets
+   - Why important
+   - How to achieve
+   - How to track
+   - Obstacles and solutions
+
+### Also Includes (from Alpha 1):
 
 **Core Features:**
-- CRRDF framework implementation with guided reflection
-- GFA performance tracking and scoring
-- Review history and search
-- Analytics dashboard with trend visualization
-- Excel export
-- Auto-save functionality
+- ✅ CRRDF framework implementation
+- ✅ GFA performance tracking
+- ✅ Review history and search
+- ✅ Analytics dashboard
+- ✅ Excel export
+- ✅ Home screen with quick actions
+- ✅ Keyboard shortcuts (Ctrl+H, Ctrl+N, Ctrl+D, etc.)
+- ✅ Status bar feedback
+- ✅ Personal setup and auto-fill
 
-**User Experience:**
-- First-run personal setup
-- Auto-fill referee and coach names
-- Home screen with quick actions
-- Keyboard shortcuts
-- Status bar feedback
-- Recent reviews quick access
+---
 
-**Technical:**
-- Cross-platform (Windows, Mac, Linux)
-- Standalone executables (no Python required)
-- Local data storage
-- Custom application icon
+## 📥 Download:
+- **Windows:** `rugby-referee-review-windows.zip`
+- **macOS:** `rugby-referee-review-macos.zip`
+- **Linux:** `rugby-referee-review-linux.tar.gz`
 
-### Known Limitations
+---
 
-**Configuration:**
-- Game grades are hardcoded (Otago region by default)
-- Regional customization requires code changes
-- No UI for grade management yet
+## 🚀 Quick Start:
 
-**Features:**
-- No PDF export (Excel only)
-- No review comparison tool
-- No goal tracking system
-- Limited chart export options
+### Creating Your IDP:
+1. Home screen → Click "Create Development Plan"
+2. Work through 9 guided sections
+3. Answer thoughtful questions for each
+4. Save draft anytime
+5. Complete and export to Word
 
-**Platform:**
-- Windows may show security warning (unsigned binary)
-- Some antivirus may flag as false positive
-- First launch may be slow (unpacking)
+### Keyboard Navigation:
+- **Tab** - Move between fields
+- **Enter** - Click focused button
+- **Ctrl+D** - Open IDP
+- **Ctrl+H** - Home screen
+- **Ctrl+N** - New review
 
-### Testing Focus
+---
 
+## ⚠️ Alpha Release Notes:
+
+**This is alpha software - please test and report issues!**
+
+### Known Limitations:
+- IDP cannot be customized per region yet
+- No progress tracking between IDP checkpoints
+- No linking between reviews and IDP focus areas
+- Limited validation on SMART goals
+
+### Testing Focus:
 We need feedback on:
+1. **IDP workflow:** Is the guided approach helpful?
+2. **Questions:** Are they clear and useful?
+3. **Keyboard navigation:** Does Tab/Enter work as expected?
+4. **Word export:** Does it match ORRA template properly?
+5. **Any crashes or bugs**
 
-1. **Workflow:** Is the review process intuitive?
-2. **Stability:** Any crashes or data loss?
-3. **Performance:** Speed and responsiveness
-4. **Usability:** Confusing areas or missing features?
-5. **Data:** Analytics accuracy and usefulness
+---
 
-### How to Provide Feedback
-
-**Report Issues:**
+## 🐛 Report Issues:
 - Help → Report Issue in app
-- GitHub Issues: https://github.com/agclarkson/ReviewApp/issues
+- GitHub: https://github.com/agclarkson/ReviewApp/issues
 
-**Include:**
-- Operating system and version
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots if helpful
+---
 
-**Feature Requests:**
-- Use GitHub Issues with "enhancement" label
-- Describe the use case and benefit
+## 📋 What's Next for Beta:
 
-### Installation
+**Planned features:**
+- IDP progress tracking (quarterly check-ins)
+- Link reviews to IDP focus areas
+- Review suggestions based on weak areas
+- Analytics tied to IDP goals
+- Regional customization for game grades
+- PDF export option
+- Review comparison tool
 
-1. Download appropriate file for your platform
-2. Extract to preferred location
-3. Run executable
-4. Complete first-run setup
-5. Start reviewing!
+---
 
-### Platform-Specific Notes
+## 🔄 Upgrade from Alpha 1:
 
-**Windows:**
-- Extract ZIP file
-- Run `Rugby Referee Review.exe`
-- May show "Unknown Publisher" warning (click "More info" → "Run anyway")
-- Windows Defender may require exception
+Your existing data is preserved:
+- All reviews remain intact
+- Settings unchanged
+- Create your first IDP!
+- Enjoy improved keyboard navigation
 
-**macOS:**
-- Extract ZIP file
-- Run `Rugby Referee Review`
-- May need to allow in System Preferences → Security & Privacy
-- Right-click → Open if prevented from launching
+---
 
-**Linux:**
-- Extract tarball: `tar -xzf rugby-referee-review-linux.tar.gz`
-- Make executable: `chmod +x rugby-referee-review`
-- Run: `./rugby-referee-review`
-- May need to install system dependencies
+## 📖 Documentation:
+- `README.md` - Complete user guide
+- `QUICK_START.md` - Fast start guide
+- `DEVELOPMENT.md` - Technical documentation
 
-### Data Storage
+---
 
-All data stored locally:
-- Reviews: `Documents/RugbyRefereeReviews/`
-- Config: `~/.rugby_referee_review_config.json`
-- No cloud sync or external services
+## 💾 Data Storage:
 
-### What's Next
+**Reviews:** `Documents/RugbyRefereeReviews/*.json`
+**IDP:** `Documents/RugbyRefereeReviews/idp.json`
+**Config:** `~/.rugby_referee_review_config.json`
+**Exports:** Wherever you save them
 
-**Beta Phase Goals:**
-- Regional grade configuration UI
-- Improved analytics (more chart types)
-- Export enhancements (PDF, chart images)
-- Bug fixes based on alpha feedback
-- Performance optimization
+---
 
-**1.0 Release Goals:**
-- Stable, tested codebase
-- Complete documentation
-- Code signing (if budget permits)
-- Installer packages
-- Multi-language support (if demand exists)
-
-### Version History
-
-**v2.0.8-alpha (Current)**
-- Initial alpha release
-- All core features functional
-- Home screen and navigation
-- Keyboard shortcuts
-- Status bar
-- Icon support
-
-**Previous Phases (Development):**
-- Phase 6: Home screen, shortcuts, status bar
-- Phase 5: Personal setup and auto-fill
-- Phase 4: Analytics dashboard
-- Phase 3: Review history
-- Phase 2: UI polish
-- Phase 1: CRRDF implementation
-
-### System Requirements
+## ⚙️ System Requirements:
 
 **Minimum:**
 - Windows 10+ / macOS 10.14+ / Ubuntu 20.04+
 - 4GB RAM
 - 100MB disk space
-- 1280x720 display
+- 1280x720 display (app opens maximized)
 
 **Recommended:**
 - 8GB RAM
-- 1920x1080 display
-- SSD for faster loading
-
-### License
-
-MIT License - Free and open source
-
-### Acknowledgments
-
-Built on the Community Rugby Referee Development Framework (CRRDF).
-
-Special thanks to:
-- CRRDF framework developers
-- Alpha testers (you!)
-- Rugby referee community
-
-### Support
-
-**Documentation:**
-- README.md - Complete guide
-- QUICK_START.md - Fast introduction
-
-**Community:**
-- GitHub Issues for bugs and features
-- Source code available for inspection
-
-### Disclaimer
-
-This is alpha software. While functional, it may contain bugs. Always backup important data. No warranty provided.
+- 1920x1080 display or larger
+- Mouse with scroll wheel
 
 ---
 
-**Ready to test?** Download, install, and start tracking your development!
+## 📜 License:
+MIT License - Free and open source
+
+---
+
+## 🙏 Acknowledgments:
+- Based on CRRDF Framework
+- ORRA IDP template
+- Alpha testers for valuable feedback
+
+---
+
+## ⌨️ Keyboard Shortcuts Reference:
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+H | Home |
+| Ctrl+N | New Review |
+| Ctrl+D | Development Plan |
+| Ctrl+B | Browse Reviews |
+| Ctrl+Shift+A | Analytics |
+| Ctrl+O | Open Review |
+| F1 | About |
+| Ctrl+Q | Quit |
+| Tab | Next field |
+| Enter | Activate button |
+
+---
+
+**Thank you for testing Alpha 2!** Your feedback helps make this tool better for the entire referee community. 🏉✨
 
 **Questions or issues?** Open a GitHub issue or contact the developer.
 

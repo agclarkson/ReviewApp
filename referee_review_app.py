@@ -10,10 +10,10 @@ This application implements the Community Rugby Referee Development Framework (C
 
 Licensed under MIT License
 
-Version: 2.0.7-phase6
+Version: 2.1.0-alpha2
 """
 
-__version__ = "2.0.8-alpha"
+__version__ = "2.1.0-alpha2"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "MIT"
@@ -233,6 +233,12 @@ class PlaceholderText(tk.Text):
         self.bind("<FocusIn>", self.on_focus_in)
         self.bind("<FocusOut>", self.on_focus_out)
         
+        # Add tab navigation - move to next widget instead of inserting tab
+        def focus_next(event):
+            event.widget.tk_focusNext().focus()
+            return "break"  # Prevent default tab behavior
+        self.bind("<Tab>", focus_next)
+        
         self.put_placeholder()
     
     def put_placeholder(self):
@@ -283,6 +289,77 @@ class ReviewSession:
         self.coach_feedback = ""
 
 
+class IDPData:
+    """Individual Development Plan data structure"""
+    def __init__(self):
+        # Meta
+        self.referee_name = ""
+        self.date = datetime.now().strftime("%Y-%m-%d")
+        self.last_updated = datetime.now().isoformat()
+        
+        # Current Reality - Club
+        self.club_level = ""
+        self.club_description = ""
+        self.club_challenges = ""
+        self.club_goal = ""
+        
+        # Current Reality - Rep
+        self.rep_involvement = ""
+        self.rep_details = ""
+        self.rep_goals = ""
+        
+        # Current Reality - Aspirations
+        self.ultimate_goal = ""
+        self.season_goal = ""
+        self.success_criteria = ""
+        
+        # The How - Fitness
+        self.fitness_level = ""
+        self.bronco_done = ""
+        self.bronco_time = ""
+        self.bronco_target = ""
+        self.training_frequency = ""
+        self.training_types = ""
+        self.fitness_target = ""
+        self.fitness_obstacles = ""
+        
+        # The How - Law
+        self.law_confidence = ""
+        self.law_weak_areas = ""
+        self.law_consistency = ""
+        self.law_plan = ""
+        
+        # The How - Mental
+        self.mental_strengths = ""
+        self.mental_challenges = ""
+        self.mental_plan = ""
+        
+        # Focus Areas
+        self.focus1_category = ""
+        self.focus1_area = ""
+        self.focus1_why = ""
+        self.focus1_goal = ""
+        self.focus1_how = ""
+        self.focus1_track = ""
+        self.focus1_obstacles = ""
+        
+        self.focus2_category = ""
+        self.focus2_area = ""
+        self.focus2_why = ""
+        self.focus2_goal = ""
+        self.focus2_how = ""
+        self.focus2_track = ""
+        self.focus2_obstacles = ""
+        
+        self.focus3_category = ""
+        self.focus3_area = ""
+        self.focus3_why = ""
+        self.focus3_goal = ""
+        self.focus3_how = ""
+        self.focus3_track = ""
+        self.focus3_obstacles = ""
+
+
 class CRRDFReviewApp:
     """Main application window"""
     
@@ -307,6 +384,10 @@ class CRRDFReviewApp:
             # If icon file not found, continue without it
             pass
         
+        # Maximize window on startup
+        self.root.state('zoomed')  # Windows/Linux
+        # For macOS, use: self.root.attributes('-zoomed', True)
+        
         # Set minimum window size
         self.root.minsize(1000, 800)
         
@@ -326,13 +407,23 @@ class CRRDFReviewApp:
         self.current_pillar = None
         self.current_question = 0
         
-        # Set up reviews directory
+        # Set up reviews directory FIRST (needed by IDP)
         self.reviews_dir = Path.home() / "Documents" / "RugbyRefereeReviews"
         self.reviews_dir.mkdir(parents=True, exist_ok=True)
         
         # Set up config file
         self.config_file = Path.home() / ".rugby_referee_review_config.json"
         self.config = self.load_config()
+        
+        # IDP data (after reviews_dir is set)
+        self.idp_data = None
+        self.idp_current_section = 0
+        self.idp_sections = [
+            "club", "rep", "aspirations",
+            "fitness", "law", "mental",
+            "focus1", "focus2", "focus3"
+        ]
+        self.load_idp()
         
         # Check if first run
         if self.config.get('first_run', True):
@@ -378,6 +469,49 @@ class CRRDFReviewApp:
                 json.dump(self.config, f, indent=2, ensure_ascii=False)
         except Exception as e:
             print(f"Failed to save config: {e}")
+    
+    def load_idp(self):
+        """Load IDP from file"""
+        idp_file = self.reviews_dir / "idp.json"
+        try:
+            if idp_file.exists():
+                with open(idp_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    idp = IDPData()
+                    # Load all fields
+                    for key, value in data.items():
+                        if hasattr(idp, key):
+                            setattr(idp, key, value)
+                    self.idp_data = idp
+                    return True
+        except Exception as e:
+            print(f"Failed to load IDP: {e}")
+        return False
+    
+    def save_idp(self):
+        """Save IDP to file"""
+        if not self.idp_data:
+            return False
+        
+        idp_file = self.reviews_dir / "idp.json"
+        try:
+            # Update last modified
+            self.idp_data.last_updated = datetime.now().isoformat()
+            
+            # Convert to dict
+            data = {}
+            for key in dir(self.idp_data):
+                if not key.startswith('_'):
+                    value = getattr(self.idp_data, key)
+                    if not callable(value):
+                        data[key] = value
+            
+            with open(idp_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            messagebox.showerror("Save Error", f"Failed to save IDP:\n{str(e)}")
+            return False
     
     def show_welcome_screen(self):
         """Show first-run welcome and setup screen"""
@@ -566,6 +700,10 @@ class CRRDFReviewApp:
         self.root.bind('<Control-Shift-A>', lambda e: self.show_analytics_dashboard())
         self.root.bind('<Control-Shift-a>', lambda e: self.show_analytics_dashboard())
         
+        # Ctrl+D - Development Plan
+        self.root.bind('<Control-d>', lambda e: self.show_idp_wizard())
+        self.root.bind('<Control-D>', lambda e: self.show_idp_wizard())
+        
         # Ctrl+O - Open Review
         self.root.bind('<Control-o>', lambda e: self.open_review())
         self.root.bind('<Control-O>', lambda e: self.open_review())
@@ -576,6 +714,14 @@ class CRRDFReviewApp:
         # Ctrl+Q - Quit
         self.root.bind('<Control-q>', lambda e: self.root.quit())
         self.root.bind('<Control-Q>', lambda e: self.root.quit())
+        
+        # Enter key - activate focused button
+        def activate_button(event):
+            widget = self.root.focus_get()
+            if isinstance(widget, tk.Button):
+                widget.invoke()
+                return "break"
+        self.root.bind('<Return>', activate_button)
     
     def update_status(self, message):
         """Update the status bar message"""
@@ -599,7 +745,9 @@ class CRRDFReviewApp:
         """Show review count in status"""
         if count is None:
             try:
-                count = len(list(self.reviews_dir.glob("*.json")))
+                # Exclude idp.json from count
+                json_files = [f for f in self.reviews_dir.glob("*.json") if f.name != "idp.json"]
+                count = len(json_files)
             except:
                 count = 0
         self.update_status(f"Ready  •  {count} reviews saved")
@@ -619,6 +767,8 @@ class CRRDFReviewApp:
         file_menu.add_command(label="Browse All Reviews...", command=self.browse_reviews, accelerator="Ctrl+B")
         file_menu.add_separator()
         file_menu.add_command(label="View Analytics", command=self.show_analytics_dashboard, accelerator="Ctrl+Shift+A")
+        file_menu.add_separator()
+        file_menu.add_command(label="My Development Plan", command=self.show_idp_wizard, accelerator="Ctrl+D")
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit, accelerator="Ctrl+Q")
         
@@ -1206,6 +1356,15 @@ class CRRDFReviewApp:
                                  activebackground="#F57C00")
         analytics_btn.pack(pady=10, fill=tk.X)
         
+        # Development Plan button - show "Edit" if exists, "Create" if not
+        idp_text = "📋 Edit Development Plan" if self.idp_data else "📋 Create Development Plan"
+        idp_btn = tk.Button(buttons_frame, text=idp_text, 
+                           command=self.show_idp_wizard,
+                           font=("Segoe UI", 14, "bold"), bg="#9C27B0", fg="white",
+                           padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                           activebackground="#7B1FA2")
+        idp_btn.pack(pady=10, fill=tk.X)
+        
         # Stats and recent reviews section
         info_frame = tk.Frame(home, bg="#F5F5F5")
         info_frame.pack(fill=tk.X, padx=40, pady=20)
@@ -1215,8 +1374,8 @@ class CRRDFReviewApp:
         stats_frame.pack(pady=15)
         
         try:
-            # Count reviews
-            json_files = list(self.reviews_dir.glob("*.json"))
+            # Count reviews (exclude idp.json)
+            json_files = [f for f in self.reviews_dir.glob("*.json") if f.name != "idp.json"]
             total_reviews = len(json_files)
             
             if total_reviews > 0:
@@ -1248,8 +1407,9 @@ class CRRDFReviewApp:
                 font=("Segoe UI", 11, "bold"), bg="#F5F5F5", fg="#212121", anchor="w").pack(fill=tk.X, pady=(5, 10))
         
         try:
-            json_files = sorted(self.reviews_dir.glob("*.json"), 
-                              key=lambda p: p.stat().st_mtime, reverse=True)[:5]
+            # Get recent reviews (exclude idp.json)
+            all_files = [f for f in self.reviews_dir.glob("*.json") if f.name != "idp.json"]
+            json_files = sorted(all_files, key=lambda p: p.stat().st_mtime, reverse=True)[:5]
             
             if json_files:
                 for filepath in json_files:
@@ -1989,6 +2149,667 @@ class CRRDFReviewApp:
         """Clear the content area"""
         for widget in self.content.winfo_children():
             widget.destroy()
+    
+    def show_idp_wizard(self):
+        """Show IDP creation/editing wizard"""
+        self.clear_content()
+        self.update_status("Development Plan")
+        
+        # Initialize IDP if not exists
+        if not self.idp_data:
+            self.idp_data = IDPData()
+            self.idp_data.referee_name = self.config.get("user_name", "")
+        
+        # Section names and questions
+        sections = {
+            "club": {"title": "Club Level", "desc": "Your current club rugby status"},
+            "rep": {"title": "Representative Level", "desc": "Your rep rugby involvement"},
+            "aspirations": {"title": "Aspirations", "desc": "Your goals and targets"},
+            "fitness": {"title": "Fitness Plan", "desc": "Physical preparation"},
+            "law": {"title": "Law Knowledge", "desc": "Laws and application"},
+            "mental": {"title": "Mental Game", "desc": "Mental preparation and resilience"},
+            "focus1": {"title": "Focus Area 1", "desc": "First key development goal"},
+            "focus2": {"title": "Focus Area 2", "desc": "Second key development goal"},
+            "focus3": {"title": "Focus Area 3", "desc": "Third key development goal"}
+        }
+        
+        section_key = self.idp_sections[self.idp_current_section]
+        section_info = sections[section_key]
+        
+        # Main container
+        container = tk.Frame(self.content, bg="white")
+        container.pack(fill=tk.BOTH, expand=True, padx=40, pady=20)
+        
+        # Progress indicator
+        progress_frame = tk.Frame(container, bg="white")
+        progress_frame.pack(fill=tk.X, pady=(0, 20))
+        
+        progress_text = f"Section {self.idp_current_section + 1} of {len(self.idp_sections)}"
+        tk.Label(progress_frame, text=progress_text,
+                font=("Segoe UI", 10), bg="white", fg="#757575").pack()
+        
+        # Progress bar
+        progress_bar = tk.Frame(progress_frame, bg="#E0E0E0", height=6)
+        progress_bar.pack(fill=tk.X, pady=5)
+        
+        percent = (self.idp_current_section / len(self.idp_sections)) * 100
+        fill_width = int(percent)
+        if fill_width > 0:
+            tk.Frame(progress_bar, bg="#1976D2", width=fill_width, height=6).place(x=0, y=0)
+        
+        # Section title
+        tk.Label(container, text=section_info["title"],
+                font=("Segoe UI", 20, "bold"), bg="white", fg="#212121").pack(pady=(0, 5))
+        tk.Label(container, text=section_info["desc"],
+                font=("Segoe UI", 11), bg="white", fg="#757575").pack(pady=(0, 20))
+        
+        # Scrollable content
+        scroll_container = tk.Frame(container, bg="white")
+        scroll_container.pack(fill=tk.BOTH, expand=True)
+        
+        canvas = tk.Canvas(scroll_container, bg="white", highlightthickness=0)
+        scrollbar = tk.Scrollbar(scroll_container, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg="white")
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Enable mousewheel scrolling
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        
+        # Questions for this section
+        self.show_idp_section_questions(scrollable_frame, section_key)
+        
+        # Navigation buttons
+        nav_frame = tk.Frame(container, bg="white")
+        nav_frame.pack(fill=tk.X, pady=(20, 0))
+        
+        if self.idp_current_section > 0:
+            tk.Button(nav_frame, text="← Previous",
+                     command=lambda: self.idp_navigate(-1),
+                     font=("Segoe UI", 11), bg="#E0E0E0", fg="#212121",
+                     padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT)
+        
+        tk.Button(nav_frame, text="Save Draft",
+                 command=self.save_idp,
+                 font=("Segoe UI", 11), bg="#2196F3", fg="white",
+                 padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=10)
+        
+        if self.idp_current_section < len(self.idp_sections) - 1:
+            tk.Button(nav_frame, text="Next →",
+                     command=lambda: self.idp_navigate(1),
+                     font=("Segoe UI", 11, "bold"), bg="#4CAF50", fg="white",
+                     padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.RIGHT)
+        else:
+            tk.Button(nav_frame, text="Complete & Export",
+                     command=self.idp_complete,
+                     font=("Segoe UI", 11, "bold"), bg="#4CAF50", fg="white",
+                     padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.RIGHT)
+    
+    def show_idp_section_questions(self, parent, section_key):
+        """Show questions for specific IDP section"""
+        # This will contain the guided questions for each section
+        # For now, adding a simplified version - we'll expand this
+        
+        questions = self.get_idp_questions(section_key)
+        self.idp_entries = {}
+        
+        for q_id, question in questions.items():
+            # Question label
+            q_frame = tk.Frame(parent, bg="white")
+            q_frame.pack(fill=tk.X, pady=10)
+            
+            tk.Label(q_frame, text=question["text"],
+                    font=("Segoe UI", 11, "bold"), bg="white", fg="#212121",
+                    wraplength=600, justify="left", anchor="w").pack(fill=tk.X, pady=(0, 5))
+            
+            if question.get("help"):
+                tk.Label(q_frame, text=question["help"],
+                        font=("Segoe UI", 9), bg="white", fg="#757575",
+                        wraplength=600, justify="left", anchor="w").pack(fill=tk.X, pady=(0, 5))
+            
+            # Input field
+            if question.get("type") == "text":
+                entry = tk.Text(q_frame, height=4, font=("Segoe UI", 10),
+                               wrap=tk.WORD, relief=tk.SOLID, bd=1)
+                entry.pack(fill=tk.X, pady=5)
+                
+                # Add tab navigation - move to next widget instead of inserting tab
+                def focus_next(event):
+                    event.widget.tk_focusNext().focus()
+                    return "break"  # Prevent default tab behavior
+                entry.bind("<Tab>", focus_next)
+                
+                # Load existing value
+                field_name = f"{section_key}_{q_id}"
+                value = getattr(self.idp_data, field_name, "")
+                if value:
+                    entry.insert("1.0", value)
+                
+                self.idp_entries[field_name] = entry
+            
+            elif question.get("type") == "dropdown":
+                var = tk.StringVar()
+                combo = ttk.Combobox(q_frame, textvariable=var,
+                                    values=question["options"],
+                                    state="readonly", font=("Segoe UI", 10))
+                combo.pack(fill=tk.X, pady=5)
+                
+                # Load existing value
+                field_name = f"{section_key}_{q_id}"
+                value = getattr(self.idp_data, field_name, "")
+                if value:
+                    var.set(value)
+                
+                self.idp_entries[field_name] = var
+    
+    def get_idp_questions(self, section_key):
+        """Get questions for a specific IDP section"""
+        questions = {
+            "club": {
+                "level": {
+                    "text": "What level do you currently referee at club rugby?",
+                    "type": "text",
+                    "help": "e.g., Division 1, U21 Colts, etc."
+                },
+                "description": {
+                    "text": "How would you describe your current club performances?",
+                    "type": "text",
+                    "help": "What's going well? What challenges are you facing?"
+                },
+                "challenges": {
+                    "text": "What are your main challenges at club level?",
+                    "type": "text",
+                    "help": "Be specific about what you find difficult"
+                },
+                "goal": {
+                    "text": "Where do you want to be by end of season?",
+                    "type": "text",
+                    "help": "Be specific - which grade? What role?"
+                }
+            },
+            "rep": {
+                "involvement": {
+                    "text": "What's your current representative involvement?",
+                    "type": "text",
+                    "help": "e.g., Assistant referee, touch judge, not involved yet"
+                },
+                "details": {
+                    "text": "Tell us about your rep experience:",
+                    "type": "text",
+                    "help": "What competitions? What's going well? What would you like to do more of?"
+                },
+                "goals": {
+                    "text": "What are your representative goals this year?",
+                    "type": "text",
+                    "help": "What role do you want? What competitions?"
+                }
+            },
+            "aspirations": {
+                "ultimate_goal": {
+                    "text": "What's your ultimate refereeing goal?",
+                    "type": "text",
+                    "help": "Dream big - where do you ultimately want to referee?"
+                },
+                "season_goal": {
+                    "text": "What's realistic for this season?",
+                    "type": "text",
+                    "help": "Break your big goal into yearly steps"
+                },
+                "success_criteria": {
+                    "text": "What would success look like this year?",
+                    "type": "text",
+                    "help": "How will you know you've progressed?"
+                }
+            },
+            "fitness": {
+                "level": {
+                    "text": "Can you keep up with play for 80 minutes?",
+                    "type": "text",
+                    "help": "Be honest about your current fitness level"
+                },
+                "bronco_done": {
+                    "text": "Have you done a Bronco test?",
+                    "type": "text",
+                    "help": "Yes/No - if yes, what was your time?"
+                },
+                "bronco_time": {
+                    "text": "Current Bronco time (if applicable):",
+                    "type": "text",
+                    "help": "e.g., 6:00"
+                },
+                "bronco_target": {
+                    "text": "Target Bronco time:",
+                    "type": "text",
+                    "help": "What time are you aiming for? e.g., 5:30"
+                },
+                "training_frequency": {
+                    "text": "How often will you train?",
+                    "type": "text",
+                    "help": "Be realistic - days per week"
+                },
+                "training_types": {
+                    "text": "What training will you do?",
+                    "type": "text",
+                    "help": "e.g., Running, gym, sport (squash, etc.)"
+                },
+                "fitness_target": {
+                    "text": "Your specific fitness target:",
+                    "type": "text",
+                    "help": "What do you want to achieve? Be specific and measurable"
+                },
+                "fitness_obstacles": {
+                    "text": "What might stop you training? How will you overcome it?",
+                    "type": "text",
+                    "help": "Think about obstacles and solutions now"
+                }
+            },
+            "law": {
+                "confidence": {
+                    "text": "How confident are you with the laws? (1-5)",
+                    "type": "text",
+                    "help": "1 = Need lots of work, 5 = Very confident"
+                },
+                "weak_areas": {
+                    "text": "Which areas need work?",
+                    "type": "text",
+                    "help": "e.g., Scrum, breakdown, maul, offside, advantage"
+                },
+                "consistency": {
+                    "text": "Can you apply laws consistently for 80 minutes?",
+                    "type": "text",
+                    "help": "What affects your consistency? Fatigue? Pressure?"
+                },
+                "plan": {
+                    "text": "Your law development plan:",
+                    "type": "text",
+                    "help": "How often will you study? What resources? Who can help?"
+                }
+            },
+            "mental": {
+                "strengths": {
+                    "text": "What are your mental strengths?",
+                    "type": "text",
+                    "help": "e.g., Staying calm, confidence, focus, decision-making"
+                },
+                "challenges": {
+                    "text": "What affects your performance mentally?",
+                    "type": "text",
+                    "help": "e.g., Nerves, pressure, mistakes, external factors"
+                },
+                "plan": {
+                    "text": "How will you build mental resilience?",
+                    "type": "text",
+                    "help": "What will you work on? Who can support you?"
+                }
+            },
+            "focus1": {
+                "category": {
+                    "text": "Focus Area Category:",
+                    "type": "text",
+                    "help": "e.g., Fitness, Law, Mental, Positioning, Communication"
+                },
+                "area": {
+                    "text": "Specific focus area:",
+                    "type": "text",
+                    "help": "What exactly will you focus on?"
+                },
+                "why": {
+                    "text": "Why is this important to you?",
+                    "type": "text",
+                    "help": "How will this help you achieve your aspirations?"
+                },
+                "goal": {
+                    "text": "Your SPECIFIC, MEASURABLE goal:",
+                    "type": "text",
+                    "help": "e.g., 'Achieve 5:30 Bronco by June' not 'Get fitter'"
+                },
+                "how": {
+                    "text": "How will you achieve this?",
+                    "type": "text",
+                    "help": "Specific actions, frequency, timeline"
+                },
+                "track": {
+                    "text": "How will you track progress?",
+                    "type": "text",
+                    "help": "How will you know you're improving?"
+                },
+                "obstacles": {
+                    "text": "Obstacles and how you'll overcome them:",
+                    "type": "text",
+                    "help": "What might stop you? What's your plan B?"
+                }
+            },
+            "focus2": {
+                "category": {
+                    "text": "Focus Area Category:",
+                    "type": "text",
+                    "help": "e.g., Fitness, Law, Mental, Positioning, Communication"
+                },
+                "area": {
+                    "text": "Specific focus area:",
+                    "type": "text",
+                    "help": "What exactly will you focus on?"
+                },
+                "why": {
+                    "text": "Why is this important to you?",
+                    "type": "text",
+                    "help": "How will this help you achieve your aspirations?"
+                },
+                "goal": {
+                    "text": "Your SPECIFIC, MEASURABLE goal:",
+                    "type": "text",
+                    "help": "Make it something you can clearly succeed or fail at"
+                },
+                "how": {
+                    "text": "How will you achieve this?",
+                    "type": "text",
+                    "help": "Specific actions, frequency, timeline"
+                },
+                "track": {
+                    "text": "How will you track progress?",
+                    "type": "text",
+                    "help": "How will you know you're improving?"
+                },
+                "obstacles": {
+                    "text": "Obstacles and how you'll overcome them:",
+                    "type": "text",
+                    "help": "What might stop you? What's your plan B?"
+                }
+            },
+            "focus3": {
+                "category": {
+                    "text": "Focus Area Category:",
+                    "type": "text",
+                    "help": "e.g., Fitness, Law, Mental, Positioning, Communication"
+                },
+                "area": {
+                    "text": "Specific focus area:",
+                    "type": "text",
+                    "help": "What exactly will you focus on?"
+                },
+                "why": {
+                    "text": "Why is this important to you?",
+                    "type": "text",
+                    "help": "How will this help you achieve your aspirations?"
+                },
+                "goal": {
+                    "text": "Your SPECIFIC, MEASURABLE goal:",
+                    "type": "text",
+                    "help": "Make it something you can clearly succeed or fail at"
+                },
+                "how": {
+                    "text": "How will you achieve this?",
+                    "type": "text",
+                    "help": "Specific actions, frequency, timeline"
+                },
+                "track": {
+                    "text": "How will you track progress?",
+                    "type": "text",
+                    "help": "How will you know you're improving?"
+                },
+                "obstacles": {
+                    "text": "Obstacles and how you'll overcome them:",
+                    "type": "text",
+                    "help": "What might stop you? What's your plan B?"
+                }
+            }
+        }
+        
+        return questions.get(section_key, {})
+    
+    def idp_navigate(self, direction):
+        """Navigate between IDP sections"""
+        # Save current section
+        self.idp_save_current_section()
+        
+        # Move to next/previous section
+        self.idp_current_section += direction
+        self.idp_current_section = max(0, min(self.idp_current_section, len(self.idp_sections) - 1))
+        
+        # Show new section
+        self.show_idp_wizard()
+    
+    def idp_save_current_section(self):
+        """Save current section data to IDP"""
+        if not hasattr(self, 'idp_entries'):
+            return
+        
+        for field_name, entry in self.idp_entries.items():
+            if isinstance(entry, tk.Text):
+                value = entry.get("1.0", tk.END).strip()
+            elif isinstance(entry, tk.StringVar):
+                value = entry.get()
+            else:
+                value = ""
+            
+            if hasattr(self.idp_data, field_name):
+                setattr(self.idp_data, field_name, value)
+    
+    def idp_complete(self):
+        """Complete IDP and export"""
+        # Save final section
+        self.idp_save_current_section()
+        
+        # Save to file
+        if self.save_idp():
+            messagebox.showinfo("Success", "IDP saved successfully!")
+            
+            # Offer to export
+            if messagebox.askyesno("Export", "Would you like to export your IDP to Word?"):
+                self.idp_export_word()
+            
+            # Return to home
+            self.show_home_screen()
+    
+    def idp_export_word(self):
+        """Export IDP to Word document matching ORRA template"""
+        try:
+            from docx import Document
+            from docx.shared import Inches, Pt, RGBColor
+            from docx.enum.text import WD_ALIGN_PARAGRAPH
+        except ImportError:
+            messagebox.showerror("Error", "python-docx not installed.\nRun: pip install python-docx")
+            return
+        
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".docx",
+            filetypes=[("Word documents", "*.docx"), ("All files", "*.*")],
+            initialfile=f"IDP_{self.idp_data.referee_name.replace(' ', '_')}_{self.idp_data.date}.docx"
+        )
+        
+        if not filename:
+            return
+        
+        try:
+            doc = Document()
+            
+            # Title
+            title = doc.add_paragraph()
+            title_run = title.add_run("Referee Individual Development Plan")
+            title_run.font.size = Pt(18)
+            title_run.font.bold = True
+            title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            
+            # Referee details
+            doc.add_paragraph(f"Referee: {self.idp_data.referee_name}")
+            doc.add_paragraph(f"Date: {self.idp_data.date}")
+            doc.add_paragraph()
+            
+            # Table 1: Current Reality
+            table1 = doc.add_table(rows=2, cols=3)
+            table1.style = 'Table Grid'
+            
+            # Headers
+            headers = ["Club", "Representative", "Aspirations"]
+            for i, header in enumerate(headers):
+                cell = table1.rows[0].cells[i]
+                cell.text = header
+                # Bold the header
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+            
+            # Content - combine all relevant fields for each column
+            club_content = []
+            if self.idp_data.club_level:
+                club_content.append(self.idp_data.club_level)
+            if self.idp_data.club_description:
+                club_content.append(self.idp_data.club_description)
+            if self.idp_data.club_challenges:
+                club_content.append(f"Challenges: {self.idp_data.club_challenges}")
+            if self.idp_data.club_goal:
+                club_content.append(f"Goal: {self.idp_data.club_goal}")
+            
+            rep_content = []
+            if self.idp_data.rep_involvement:
+                rep_content.append(self.idp_data.rep_involvement)
+            if self.idp_data.rep_details:
+                rep_content.append(self.idp_data.rep_details)
+            if self.idp_data.rep_goals:
+                rep_content.append(f"Goals: {self.idp_data.rep_goals}")
+            
+            asp_content = []
+            if self.idp_data.ultimate_goal:
+                asp_content.append(f"Ultimate: {self.idp_data.ultimate_goal}")
+            if self.idp_data.season_goal:
+                asp_content.append(f"This Season: {self.idp_data.season_goal}")
+            if self.idp_data.success_criteria:
+                asp_content.append(f"Success: {self.idp_data.success_criteria}")
+            
+            table1.rows[1].cells[0].text = "\n".join(club_content) if club_content else "Not completed"
+            table1.rows[1].cells[1].text = "\n".join(rep_content) if rep_content else "Not completed"
+            table1.rows[1].cells[2].text = "\n".join(asp_content) if asp_content else "Not completed"
+            
+            doc.add_paragraph()
+            
+            # Table 2: The How
+            table2 = doc.add_table(rows=2, cols=3)
+            table2.style = 'Table Grid'
+            
+            headers2 = ["Fitness", "Law", "Mental"]
+            for i, header in enumerate(headers2):
+                cell = table2.rows[0].cells[i]
+                cell.text = header
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+            
+            # Build comprehensive fitness content
+            fitness_content = []
+            if self.idp_data.fitness_level:
+                fitness_content.append(f"Current: {self.idp_data.fitness_level}")
+            if self.idp_data.bronco_done:
+                fitness_content.append(f"Bronco: {self.idp_data.bronco_done}")
+            if self.idp_data.bronco_time:
+                fitness_content.append(f"Current time: {self.idp_data.bronco_time}")
+            if self.idp_data.bronco_target:
+                fitness_content.append(f"Target: {self.idp_data.bronco_target}")
+            if self.idp_data.training_frequency:
+                fitness_content.append(f"Training: {self.idp_data.training_frequency}")
+            if self.idp_data.training_types:
+                fitness_content.append(f"Types: {self.idp_data.training_types}")
+            if self.idp_data.fitness_target:
+                fitness_content.append(f"Goal: {self.idp_data.fitness_target}")
+            if self.idp_data.fitness_obstacles:
+                fitness_content.append(f"Obstacles: {self.idp_data.fitness_obstacles}")
+            
+            # Build comprehensive law content
+            law_content = []
+            if self.idp_data.law_confidence:
+                law_content.append(f"Confidence: {self.idp_data.law_confidence}/5")
+            if self.idp_data.law_weak_areas:
+                law_content.append(f"Weak areas: {self.idp_data.law_weak_areas}")
+            if self.idp_data.law_consistency:
+                law_content.append(f"Consistency: {self.idp_data.law_consistency}")
+            if self.idp_data.law_plan:
+                law_content.append(f"Plan: {self.idp_data.law_plan}")
+            
+            # Build comprehensive mental content
+            mental_content = []
+            if self.idp_data.mental_strengths:
+                mental_content.append(f"Strengths: {self.idp_data.mental_strengths}")
+            if self.idp_data.mental_challenges:
+                mental_content.append(f"Challenges: {self.idp_data.mental_challenges}")
+            if self.idp_data.mental_plan:
+                mental_content.append(f"Plan: {self.idp_data.mental_plan}")
+            
+            table2.rows[1].cells[0].text = "\n".join(fitness_content) if fitness_content else "Not completed"
+            table2.rows[1].cells[1].text = "\n".join(law_content) if law_content else "Not completed"
+            table2.rows[1].cells[2].text = "\n".join(mental_content) if mental_content else "Not completed"
+            
+            doc.add_paragraph()
+            
+            # Table 3: Key Focus Areas
+            table3 = doc.add_table(rows=2, cols=3)
+            table3.style = 'Table Grid'
+            
+            headers3 = ["Focus Area 1", "Focus Area 2", "Focus Area 3"]
+            for i, header in enumerate(headers3):
+                cell = table3.rows[0].cells[i]
+                cell.text = header
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+            
+            # Build focus area 1 content
+            focus1_content = []
+            if self.idp_data.focus1_category:
+                focus1_content.append(f"Category: {self.idp_data.focus1_category}")
+            if self.idp_data.focus1_area:
+                focus1_content.append(f"Area: {self.idp_data.focus1_area}")
+            if self.idp_data.focus1_goal:
+                focus1_content.append(f"Goal: {self.idp_data.focus1_goal}")
+            if self.idp_data.focus1_how:
+                focus1_content.append(f"How: {self.idp_data.focus1_how}")
+            if self.idp_data.focus1_track:
+                focus1_content.append(f"Track: {self.idp_data.focus1_track}")
+            
+            # Build focus area 2 content
+            focus2_content = []
+            if self.idp_data.focus2_category:
+                focus2_content.append(f"Category: {self.idp_data.focus2_category}")
+            if self.idp_data.focus2_area:
+                focus2_content.append(f"Area: {self.idp_data.focus2_area}")
+            if self.idp_data.focus2_goal:
+                focus2_content.append(f"Goal: {self.idp_data.focus2_goal}")
+            if self.idp_data.focus2_how:
+                focus2_content.append(f"How: {self.idp_data.focus2_how}")
+            if self.idp_data.focus2_track:
+                focus2_content.append(f"Track: {self.idp_data.focus2_track}")
+            
+            # Build focus area 3 content
+            focus3_content = []
+            if self.idp_data.focus3_category:
+                focus3_content.append(f"Category: {self.idp_data.focus3_category}")
+            if self.idp_data.focus3_area:
+                focus3_content.append(f"Area: {self.idp_data.focus3_area}")
+            if self.idp_data.focus3_goal:
+                focus3_content.append(f"Goal: {self.idp_data.focus3_goal}")
+            if self.idp_data.focus3_how:
+                focus3_content.append(f"How: {self.idp_data.focus3_how}")
+            if self.idp_data.focus3_track:
+                focus3_content.append(f"Track: {self.idp_data.focus3_track}")
+            
+            table3.rows[1].cells[0].text = "\n".join(focus1_content) if focus1_content else "Not completed"
+            table3.rows[1].cells[1].text = "\n".join(focus2_content) if focus2_content else "Not completed"
+            table3.rows[1].cells[2].text = "\n".join(focus3_content) if focus3_content else "Not completed"
+            
+            doc.save(filename)
+            messagebox.showinfo("Success", f"IDP exported to:\n{filename}")
+            
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export:\n{str(e)}")
 
 
 def show_splash_screen(parent):
@@ -2010,6 +2831,13 @@ def show_splash_screen(parent):
     # App title
     tk.Label(frame, text="Rugby Referee Review System", 
             font=("Segoe UI", 20, "bold"), bg="#1976D2", fg="white").pack(pady=(40, 10))
+    
+    # Alpha Release badge
+    alpha_frame = tk.Frame(frame, bg="#FF9800", relief=tk.RAISED, bd=1)
+    alpha_frame.pack(pady=5)
+    tk.Label(alpha_frame, text="ALPHA RELEASE 2", 
+            font=("Segoe UI", 9, "bold"), bg="#FF9800", fg="white",
+            padx=15, pady=3).pack()
     
     # Version
     tk.Label(frame, text=f"Version {__version__}", 
