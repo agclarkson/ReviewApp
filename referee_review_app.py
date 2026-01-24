@@ -8,7 +8,12 @@ All Rights Reserved
 
 This application implements the Community Rugby Referee Development Framework (CRRDF).
 
-Licensed under MIT License
+PERSONAL USE LICENSE:
+This software is free for personal use by rugby referees and non-profit
+referee associations. Commercial use requires a separate license.
+
+For commercial licensing inquiries, contact:
+https://github.com/agclarkson/ReviewApp/issues
 
 Version: 2.1.0-alpha2
 """
@@ -16,7 +21,7 @@ Version: 2.1.0-alpha2
 __version__ = "2.1.0-alpha2"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
-__license__ = "MIT"
+__license__ = "Personal Use - Commercial license available"
 
 # Application Constants
 CRRDF_VERSION = "February 2025"
@@ -1194,13 +1199,22 @@ class CRRDFReviewApp:
         
         tk.Label(content, text="", bg="white").pack(pady=10)  # Spacer
         
-        tk.Label(content, text="Licensed under MIT License", 
-                font=("Segoe UI", 9), bg="white", fg="#757575").pack()
+        # License info
+        license_frame = tk.Frame(content, bg="#F5F5F5", relief=tk.SOLID, bd=1)
+        license_frame.pack(fill=tk.X, pady=5)
+        
+        tk.Label(license_frame, text="Personal Use License", 
+                font=("Segoe UI", 9, "bold"), bg="#F5F5F5", fg="#212121").pack(pady=(8, 2))
+        tk.Label(license_frame, text="Free for individual referees & non-profit associations", 
+                font=("Segoe UI", 8), bg="#F5F5F5", fg="#757575").pack(pady=(0, 8))
+        
+        tk.Label(content, text="Commercial licensing available", 
+                font=("Segoe UI", 8), bg="white", fg="#757575").pack(pady=2)
         
         # Close button
         tk.Button(content, text="Close", command=about_window.destroy,
                  font=("Segoe UI", 10, "bold"), bg="#1976D2", fg="white",
-                 padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=20)
+                 padx=30, pady=8, relief=tk.FLAT, cursor="hand2").pack(pady=15)
     
     def open_github_issues(self):
         """Open GitHub issues page in browser"""

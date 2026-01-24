@@ -3,8 +3,8 @@
 A desktop application for rugby referees to track their development using the Community Rugby Referee Development Framework (CRRDF) and create Individual Development Plans (IDPs).
 
 **Version:** 2.1.0-alpha2  
-**License:** MIT  
-**Author:** Andrew Clarkson
+**Author:** Andrew Clarkson  
+**License:** Personal Use - Commercial license available
 
 ---
 
@@ -75,7 +75,7 @@ This information can be updated later via Settings → Personal Info.
 6. **Coach Feedback:** Add notes from your coach
 7. **Save & Export:** Generates Excel file and saves JSON for history
 
-**Keyboard Tip:** Use **Tab** to move between fields and **Enter** to click buttons - no mouse needed!
+**Keyboard Tip:** Use **Tab** to move between fields and **Enter** to click buttons!
 
 ### Creating Your Individual Development Plan
 
@@ -95,8 +95,7 @@ This information can be updated later via Settings → Personal Info.
    - Identify obstacles and solutions
 5. **Save & Export:** Saves to JSON and exports to Word
 
-**Guided Questions:**
-Each section has thoughtful prompts with help text and examples to guide your reflection and goal-setting.
+**Guided Questions:** Each section has thoughtful prompts with help text and examples.
 
 ### Editing Your IDP
 
@@ -125,8 +124,7 @@ Displays:
 - Load existing reviews to edit
 - Delete unwanted reviews
 
-**Recent Reviews:**
-Quick access to your last 5 reviews from the home screen
+**Recent Reviews:** Quick access to your last 5 reviews from the home screen
 
 ## Keyboard Shortcuts
 
@@ -143,7 +141,7 @@ Quick access to your last 5 reviews from the home screen
 | **Tab** | **Next field** |
 | **Enter** | **Click focused button** |
 
-**Full keyboard navigation:** You can use the entire app without touching your mouse!
+**Full keyboard navigation available - no mouse needed!**
 
 ## Data Storage
 
@@ -296,7 +294,6 @@ Some antivirus software may flag PyInstaller-built executables.
 ### App Opens Too Small
 - App should open maximized automatically
 - If not, maximize the window manually
-- Future updates will remember window state
 
 ## Development
 
@@ -341,14 +338,14 @@ pyinstaller --onefile --windowed --name "rugby-referee-review" --icon icon_512.p
 ### Project Structure
 ```
 ReviewApp/
-├── referee_review_app.py    # Main application (2,898 lines)
+├── referee_review_app.py    # Main application (2,900+ lines)
 ├── icon.ico                  # Windows icon
 ├── icon.iconset/             # macOS icon source
 ├── icon_512.png              # Linux icon
 ├── requirements.txt          # Python dependencies
+├── LICENSE                   # Personal Use License
 ├── README.md                 # This file
 ├── QUICK_START.md            # Quick reference guide
-├── DEVELOPMENT.md            # Technical documentation
 └── .github/
     └── workflows/
         └── build-releases.yml # CI/CD configuration
@@ -404,15 +401,44 @@ This is an alpha release for testing. Known limitations:
 
 ## License
 
-MIT License - see LICENSE file for details.
+**Personal Use License** - Free for individual referees and non-profit associations.
 
-Copyright © 2025 Andrew Clarkson
+### You Can:
+- ✅ Use freely for personal referee development
+- ✅ Use in educational settings
+- ✅ Use by non-profit referee associations
+- ✅ Modify for personal use
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+### You Cannot:
+- ❌ Use commercially without a license
+- ❌ Sell or redistribute the software
+- ❌ Remove copyright notices
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+### Commercial Use
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Commercial use (including rugby unions, commercial training providers, or integration 
+into commercial products) requires a separate commercial license.
+
+**For commercial licensing inquiries:**
+- Open an issue: [GitHub Issues](https://github.com/agclarkson/ReviewApp/issues)
+- Label it: "Commercial License Inquiry"
+
+This approach ensures the software remains free for referees while protecting 
+commercial rights for potential partnerships with rugby organizations.
+
+### Full License
+
+See the LICENSE file for complete terms.
+
+---
+
+**Copyright © 2025 Andrew Clarkson**
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software to use it for personal, educational, and non-profit purposes. Commercial use 
+requires a separate license agreement.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 ## Acknowledgments
 
@@ -445,7 +471,6 @@ Special thanks to:
 **Documentation:**
 - README.md - Complete guide (this file)
 - QUICK_START.md - Fast introduction
-- DEVELOPMENT.md - Technical documentation
 
 **Get Help:**
 - Check the troubleshooting section above
@@ -453,14 +478,9 @@ Special thanks to:
 - Open an issue on GitHub
 - Use Help → Report Issue in the app
 
-**Community:**
-- GitHub Issues for bugs and features
-- Source code available for inspection
-- Contributions welcome
-
 ---
 
-**For questions or support:** Open an issue on GitHub or contact the developer.
+**For questions or support:** Open an issue on GitHub
 
 **Version:** 2.1.0-alpha2  
 **Last Updated:** January 2025  

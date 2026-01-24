@@ -1,30 +1,68 @@
-MIT License
+Copyright © 2025 Andrew Clarkson
+All Rights Reserved
 
-Copyright (c) 2025 Andrew Clarkson
+PERSONAL USE LICENSE
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+of this software and associated documentation files (the "Software"), to use
+the Software for personal, educational, and non-profit purposes, subject to
+the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+PERMITTED USES:
+1. Personal use by individual rugby referees for their own development tracking
+2. Educational purposes in referee training and development programs
+3. Use by non-profit rugby referee associations and clubs
+4. Evaluation and testing of the Software
+5. Modification for personal use only (modifications may not be distributed)
 
+PROHIBITED WITHOUT COMMERCIAL LICENSE:
+1. Commercial use, including but not limited to:
+   - Sale or licensing of the Software
+   - Use by commercial entities or for-profit organizations
+   - Integration into commercial products or services
+   - Use by national or regional rugby unions for organizational purposes
+2. Redistribution or sublicensing of the Software or any portion thereof
+3. Distribution of modified versions of the Software
+4. Removal or modification of copyright notices or this license
+5. Use of the Software name or branding for commercial purposes
+
+TRADEMARK NOTICE:
+"Rugby Referee Review System" and associated branding, icons, and design
+elements are trademarks of Andrew Clarkson. Use of these marks requires
+explicit written permission.
+
+ATTRIBUTION:
+All copies and uses of the Software must maintain attribution to Andrew Clarkson
+and include this license notice.
+
+COMMERCIAL LICENSING:
+For commercial use, including but not limited to use by rugby unions, commercial
+training providers, or integration into commercial products, a separate commercial
+license is required. 
+
+For commercial licensing inquiries, please contact:
+Email: [INSERT YOUR EMAIL]
+GitHub: https://github.com/agclarkson/ReviewApp/issues
+
+DISCLAIMER:
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+AUTHOR OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+TERMINATION:
+This license is effective until terminated. Your rights under this license will
+terminate automatically without notice if you fail to comply with any of its terms.
+Upon termination, you must destroy all copies of the Software in your possession.
+
+GOVERNING LAW:
+This license shall be governed by and construed in accordance with the laws of
+New Zealand, without regard to its conflict of law provisions.
+
 ---
 
-This software incorporates the Community Rugby Referee Development Framework
-(CRRDF) developed by New Zealand Rugby (NZR, February 2025).
-
-The CRRDF framework and associated performance indicators are used with
-acknowledgment to New Zealand Rugby and align with World Rugby match official
-development principles.
+Version: 2.1.0-alpha2
+Last Updated: January 2025
