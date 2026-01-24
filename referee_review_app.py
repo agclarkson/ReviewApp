@@ -15,10 +15,10 @@ referee associations. Commercial use requires a separate license.
 For commercial licensing inquiries, contact:
 https://github.com/agclarkson/ReviewApp/issues
 
-Version: 2.1.0-alpha2
+Version: 2.1.1-alpha3
 """
 
-__version__ = "2.1.0-alpha2"
+__version__ = "2.1.1-alpha3"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
@@ -26,22 +26,44 @@ __license__ = "Personal Use - Commercial license available"
 # Application Constants
 CRRDF_VERSION = "February 2025"
 
-# Common Rugby Game Grades
-GAME_GRADES = [
-    "Division 1",
-    "Southern Premier",
-    "Central Premier",
-    "Women's Division 1",
-    "Premier 1st XV",
-    "Division 2",
-    "Division 3",
-    "U20 Colts",
-    "U21 Colts Division 1",
-    "U21 Colts Division 2",
-    "Women's Division 2",
-    "High School",
-    "Other"
-]
+# Regional Game Grades
+REGIONAL_GRADES = {
+    "Otago": [
+        "Division 1",
+        "Southern Premier",
+        "Central Premier",
+        "Women's Division 1",
+        "Premier 1st XV",
+        "Division 2",
+        "Division 3",
+        "U20 Colts",
+        "U21 Colts Division 1",
+        "U21 Colts Division 2",
+        "Women's Division 2",
+        "High School",
+        "Other"
+    ],
+    "Southland": [
+        "Premier Men",
+        "Premier Women",
+        "Division 1",
+        "Division 2",
+        "Senior C's",
+        "Premier 1st XV",
+        "High School",
+        "Other"
+    ],
+    "South Canterbury": [
+        "Premier",
+        "Premier Reserve",
+        "1st XV",
+        "High School",
+        "Other"
+    ]
+}
+
+# Default grades list (for backwards compatibility)
+GAME_GRADES = REGIONAL_GRADES["Otago"]
 
 import tkinter as tk
 from tkinter import messagebox, filedialog
@@ -420,6 +442,11 @@ class CRRDFReviewApp:
         self.config_file = Path.home() / ".rugby_referee_review_config.json"
         self.config = self.load_config()
         
+        # Load region preference and set game grades
+        if "region" in self.config:
+            global GAME_GRADES
+            GAME_GRADES = REGIONAL_GRADES.get(self.config["region"], REGIONAL_GRADES["Otago"])
+        
         # IDP data (after reviews_dir is set)
         self.idp_data = None
         self.idp_current_section = 0
@@ -573,6 +600,21 @@ class CRRDFReviewApp:
         coach_entry = tk.Entry(coach_frame, font=("Segoe UI", 12), width=40)
         coach_entry.pack(fill=tk.X, pady=5)
         
+        # Region selection
+        region_frame = tk.Frame(content, bg="white")
+        region_frame.pack(fill=tk.X, pady=20)
+        
+        tk.Label(region_frame, text="Your Region:", 
+                font=("Segoe UI", 11, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        tk.Label(region_frame, text="This determines which game grades appear in your reviews", 
+                font=("Segoe UI", 9), bg="white", fg="#757575", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        region_var = tk.StringVar(value="Otago")
+        region_dropdown = ttk.Combobox(region_frame, textvariable=region_var, 
+                                       values=list(REGIONAL_GRADES.keys()),
+                                       state="readonly", font=("Segoe UI", 12), width=38)
+        region_dropdown.pack(fill=tk.X, pady=5)
+        
         # Error label
         error_label = tk.Label(content, text="", font=("Segoe UI", 10), 
                               bg="white", fg="#F44336")
@@ -587,14 +629,20 @@ class CRRDFReviewApp:
                 return
             
             coach = coach_entry.get().strip()
+            region = region_var.get()
             
             # Save config
             self.config = {
                 "first_run": False,
                 "user_name": name,
-                "coach_name": coach
+                "coach_name": coach,
+                "region": region
             }
             self.save_config()
+            
+            # Update game grades for selected region
+            global GAME_GRADES
+            GAME_GRADES = REGIONAL_GRADES[region]
             
             # Clear welcome screen
             welcome.destroy()
@@ -1226,7 +1274,7 @@ class CRRDFReviewApp:
         """Show personal settings dialog"""
         settings = tk.Toplevel(self.root)
         settings.title("Personal Settings")
-        settings.geometry("550x400")
+        settings.geometry("550x520")
         settings.resizable(False, False)
         
         # Center the dialog
@@ -1234,8 +1282,8 @@ class CRRDFReviewApp:
         settings.grab_set()
         
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 275
-        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 200
-        settings.geometry(f"550x400+{x}+{y}")
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 260
+        settings.geometry(f"550x520+{x}+{y}")
         
         # Header
         header = tk.Frame(settings, bg="#1976D2", height=60)
@@ -1268,6 +1316,19 @@ class CRRDFReviewApp:
         coach_entry.pack(fill=tk.X, pady=(0, 15), ipady=5)
         coach_entry.insert(0, self.config.get("coach_name", ""))
         
+        # Region field
+        tk.Label(content, text="Your Region:", 
+                font=("Segoe UI", 10, "bold"), bg="white", fg="#212121", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        tk.Label(content, text="Determines which game grades appear in reviews", 
+                font=("Segoe UI", 9), bg="white", fg="#757575", anchor="w").pack(fill=tk.X, pady=(0, 5))
+        
+        region_var = tk.StringVar(value=self.config.get("region", "Otago"))
+        region_dropdown = ttk.Combobox(content, textvariable=region_var,
+                                       values=list(REGIONAL_GRADES.keys()),
+                                       state="readonly", font=("Segoe UI", 11), width=38)
+        region_dropdown.pack(fill=tk.X, pady=(0, 15), ipady=3)
+        
         # Status label
         status_label = tk.Label(content, text="", font=("Segoe UI", 10), bg="white", height=2)
         status_label.pack(pady=10)
@@ -1281,10 +1342,16 @@ class CRRDFReviewApp:
                 return
             
             coach = coach_entry.get().strip()
+            region = region_var.get()
             
             self.config["user_name"] = name
             self.config["coach_name"] = coach
+            self.config["region"] = region
             self.save_config()
+            
+            # Update game grades immediately
+            global GAME_GRADES
+            GAME_GRADES = REGIONAL_GRADES[region]
             
             status_label.config(text="✓ Settings saved successfully!", fg="#4CAF50")
             self.root.after(1500, settings.destroy)
@@ -1488,20 +1555,9 @@ class CRRDFReviewApp:
         """Game metadata entry screen"""
         self.clear_content()
         
-        # Create scrollable canvas
-        canvas = tk.Canvas(self.content, bg="#FAFAFA", highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg="#FAFAFA")
-        
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-        
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=1050)
-        canvas.configure(yscrollcommand=scrollbar.set)
-        
-        frame = scrollable_frame
+        # Use regular frame instead of scrollable canvas (no scrolling needed)
+        frame = tk.Frame(self.content, bg="#FAFAFA")
+        frame.pack(fill=tk.BOTH, expand=True)
         
         tk.Label(frame, text="Game Information", font=("Segoe UI", 16, "bold"),
                 bg="#FAFAFA", fg="#212121").pack(pady=10)
@@ -1512,6 +1568,7 @@ class CRRDFReviewApp:
         # Game & Grade - Dropdown
         container = tk.Frame(frame, bg="#FAFAFA")
         container.pack(fill=tk.X, pady=5, padx=20)
+        
         tk.Label(container, text="Game & Grade:", width=15, anchor="w",
                 bg="#FAFAFA", font=("Segoe UI", 10, "bold"), fg="#212121").pack(side=tk.LEFT)
         
@@ -1651,15 +1708,6 @@ class CRRDFReviewApp:
         tk.Button(nav, text="Next: Self Reflection", command=self.show_self_reflection,
                  font=("Segoe UI", 11, "bold"), bg="#00796B", fg="white",
                  padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack()
-        
-        # Pack canvas and scrollbar
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        
-        # Bind mousewheel
-        def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
         
     def show_self_reflection(self):
         """Self reflection questions"""
@@ -2849,7 +2897,7 @@ def show_splash_screen(parent):
     # Alpha Release badge
     alpha_frame = tk.Frame(frame, bg="#FF9800", relief=tk.RAISED, bd=1)
     alpha_frame.pack(pady=5)
-    tk.Label(alpha_frame, text="ALPHA RELEASE 2", 
+    tk.Label(alpha_frame, text="ALPHA RELEASE 3", 
             font=("Segoe UI", 9, "bold"), bg="#FF9800", fg="white",
             padx=15, pady=3).pack()
     
