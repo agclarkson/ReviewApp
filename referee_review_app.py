@@ -59,7 +59,63 @@ REGIONAL_GRADES = {
         "1st XV",
         "High School",
         "Other"
-    ]
+    ],
+    "Canterbury": [
+        "Metro Premier",
+        "Combined Country Division 1",
+        "North Canterbury Division 1",
+        "Ellesmere Division 1",
+        "Premier Women's",
+        "Metro Premier Reserve",
+        "North Canterbury Division 2",
+        "Ellesmere Division 2",
+        "Ellesmere Division 3",
+        "Metro Colts",
+        "Combined Country Colts",
+        "Ellesmere Colts",
+        "Premier Reserve Women's",
+        "Metro Classics",
+        "Southern Alps Ultra U85KG",
+        "Senior Girls",
+        "1st XV",
+        "Girls 1st XV",
+        "High School",
+        "Other"
+    ],
+    "North Otago": [
+        "Citizen's Shield",
+        "President's Grade",
+        "Premier Women's",
+        "1st XV",
+        "High School",
+        "Other"
+    ],
+    "Wairarapa Bush": [
+        "Premiers",
+        "Reserves",
+        "High School",
+        "Other"
+    ],
+    "Horowhenua Kapiti": [
+        "Premier",
+        "Senior Reserves",
+        "Senior Women's Rugby",
+        "High School",
+        "Other"
+    ],
+    "Manawatu": [
+        "Hankins Shield",
+        "Prue Christie Cup",
+        "Senior Two",
+        "Senior Three",
+        "Colts",
+        "Presidents",
+        "U85kg",
+        "1st XV",
+        "High School",
+        "Other"
+    ],
+
 }
 
 # Default grades list (for backwards compatibility)
