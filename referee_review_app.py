@@ -467,18 +467,22 @@ class CRRDFReviewApp:
             # If icon file not found, continue without it
             pass
         
-        # Maximize window on startup
-        self.root.state('zoomed')  # Windows/Linux
-        # For macOS, use: self.root.attributes('-zoomed', True)
+        # Get screen dimensions
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
         
-        # Set minimum window size
-        self.root.minsize(1000, 800)
+        # Set minimum window size (responsive to screen)
+        min_width = min(1000, int(screen_width * 0.7))
+        min_height = min(700, int(screen_height * 0.7))
+        self.root.minsize(min_width, min_height)
         
-        # Start with a good default size for home screen
-        self.root.geometry("1200x850")
-        
-        # Center window on screen
-        self.center_window()
+        # Start maximized for best experience
+        try:
+            # Try Windows/Linux method
+            self.root.state('zoomed')
+        except:
+            # Fallback for systems where 'zoomed' doesn't work
+            self.root.geometry(f"{screen_width}x{screen_height}+0+0")
         
         # Allow window to be resizable
         self.root.resizable(True, True)
@@ -895,7 +899,77 @@ class CRRDFReviewApp:
     
     def new_review(self):
         """Start a new review"""
-        if messagebox.askyesno("New Review", "Start a new review? Any unsaved data will be lost."):
+        # Check if there's a review in progress (has any meaningful data entered)
+        has_progress = False
+        
+        # Get auto-filled values to exclude them
+        auto_filled_referee = self.config.get("user_name", "")
+        auto_filled_coach = self.config.get("coach_name", "")
+        auto_filled_date = datetime.now().strftime("%Y-%m-%d")  # Today's date
+        
+        # DEBUG: Print what we're checking
+        print(f"DEBUG - Checking progress:")
+        print(f"  Auto-filled referee: '{auto_filled_referee}'")
+        print(f"  Auto-filled coach: '{auto_filled_coach}'")
+        print(f"  Auto-filled date: '{auto_filled_date}'")
+        print(f"  Session metadata: {self.session.metadata}")
+        
+        # Check metadata (excluding auto-filled referee/coach/date)
+        metadata_progress = False
+        for key, value in self.session.metadata.items():
+            print(f"  Checking {key}: '{value}'")
+            if key == "referee" and value == auto_filled_referee:
+                print(f"    -> Skipping (auto-filled referee)")
+                continue  # Skip auto-filled referee
+            if key == "coach" and value == auto_filled_coach:
+                print(f"    -> Skipping (auto-filled coach)")
+                continue  # Skip auto-filled coach
+            if key == "date" and value == auto_filled_date:
+                print(f"    -> Skipping (auto-filled date)")
+                continue  # Skip auto-filled today's date
+            if key == "date_completed" and value == auto_filled_date:
+                print(f"    -> Skipping (auto-filled date_completed)")
+                continue  # Skip auto-filled date_completed too
+            if value:  # Has actual user-entered data
+                print(f"    -> PROGRESS DETECTED!")
+                metadata_progress = True
+                break
+        
+        print(f"  Metadata progress: {metadata_progress}")
+        print(f"  Reflections: {bool(self.session.reflections and any(self.session.reflections.values()))}")
+        print(f"  CRRDF reflections: {bool(self.session.crrdf_reflections)}")
+        print(f"  GFA scores: {bool(self.session.gfa_scores)}")
+        
+        # Check if there's ANY actual progress
+        if (metadata_progress or 
+            (self.session.reflections and any(self.session.reflections.values())) or
+            self.session.crrdf_reflections or 
+            self.session.gfa_scores):
+            has_progress = True
+        
+        print(f"  FINAL has_progress: {has_progress}")
+        
+        if has_progress:
+            # Review in progress - offer to resume
+            response = messagebox.askyesnocancel(
+                "Review In Progress",
+                "You have a review in progress.\n\nResume current review?",
+                icon='question'
+            )
+            
+            if response is True:  # Yes - Resume
+                # Go to appropriate page (metadata entry to continue)
+                self.show_metadata_entry()
+                return
+            elif response is False:  # No - Start new
+                # Clear session and start fresh
+                self.session = ReviewSession()
+                self.show_metadata_entry()
+                return
+            else:  # Cancel
+                return
+        else:
+            # No progress - start new review directly
             self.session = ReviewSession()
             self.show_metadata_entry()
     
@@ -1109,8 +1183,19 @@ class CRRDFReviewApp:
         content = tk.Frame(canvas, bg="white")
         
         content.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=content, anchor="nw", width=1150)
+        canvas_window = canvas.create_window((0, 0), window=content, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width after initial display and on window resize
+        def update_canvas_width(event=None):
+            # Update after a short delay to ensure canvas has correct width
+            dashboard.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        # Bind to root window configure event for resizing
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        
+        # Initial update after display
+        dashboard.after(100, update_canvas_width)
         
         # Statistics Section
         stats_frame = tk.Frame(content, bg="white")
@@ -1434,27 +1519,37 @@ class CRRDFReviewApp:
         # Update status
         self.status_info()
         
-        # Main container
-        home = tk.Frame(self.content, bg="white")
-        home.pack(fill=tk.BOTH, expand=True)
+        # Create scrollable canvas for home screen
+        canvas = tk.Canvas(self.content, bg="white", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
+        home = tk.Frame(canvas, bg="white")
         
-        # Welcome section
+        home.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas_window = canvas.create_window((0, 0), window=home, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width when window resizes
+        def update_canvas_width(event=None):
+            self.content.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        self.content.after(100, update_canvas_width)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Enable mousewheel scrolling
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        
+        # Welcome section - without logo to save space
         welcome_frame = tk.Frame(home, bg="white")
-        welcome_frame.pack(pady=40)
-        
-        # Show icon if we have it (or placeholder)
-        icon_frame = tk.Frame(welcome_frame, bg="white")
-        icon_frame.pack(pady=20)
-        
-        # Create a simple placeholder icon using canvas
-        canvas = tk.Canvas(icon_frame, width=120, height=120, bg="white", highlightthickness=0)
-        canvas.pack()
-        
-        # Draw circle
-        canvas.create_oval(10, 10, 110, 110, fill="#1976D2", outline="#0D47A1", width=3)
-        
-        # Draw text
-        canvas.create_text(60, 60, text="RR", font=("Segoe UI", 36, "bold"), fill="white")
+        welcome_frame.pack(pady=20)
         
         # Welcome text
         user_name = self.config.get("user_name", "")
@@ -1465,42 +1560,45 @@ class CRRDFReviewApp:
         tk.Label(welcome_frame, text="Track your development with the CRRDF Framework", 
                 font=("Segoe UI", 11), bg="white", fg="#757575").pack()
         
-        # Action buttons
+        # Action buttons - centered with max width
         buttons_frame = tk.Frame(home, bg="white")
         buttons_frame.pack(pady=30)
         
+        # Set a reasonable max width for buttons
+        button_width = 40  # characters
+        
         # New Review button
         new_btn = tk.Button(buttons_frame, text="📝 New Review", 
-                           command=self.show_metadata_entry,
+                           command=self.new_review,
                            font=("Segoe UI", 14, "bold"), bg="#4CAF50", fg="white",
-                           padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                           width=button_width, pady=20, relief=tk.FLAT, cursor="hand2",
                            activebackground="#45a049")
-        new_btn.pack(pady=10, fill=tk.X)
+        new_btn.pack(pady=10)
         
         # Browse Reviews button
         browse_btn = tk.Button(buttons_frame, text="📂 Browse Reviews", 
                               command=self.browse_reviews,
                               font=("Segoe UI", 14, "bold"), bg="#2196F3", fg="white",
-                              padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                              width=button_width, pady=20, relief=tk.FLAT, cursor="hand2",
                               activebackground="#1976D2")
-        browse_btn.pack(pady=10, fill=tk.X)
+        browse_btn.pack(pady=10)
         
         # View Analytics button
         analytics_btn = tk.Button(buttons_frame, text="📊 View Analytics", 
                                  command=self.show_analytics_dashboard,
                                  font=("Segoe UI", 14, "bold"), bg="#FF9800", fg="white",
-                                 padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                                 width=button_width, pady=20, relief=tk.FLAT, cursor="hand2",
                                  activebackground="#F57C00")
-        analytics_btn.pack(pady=10, fill=tk.X)
+        analytics_btn.pack(pady=10)
         
         # Development Plan button - show "Edit" if exists, "Create" if not
         idp_text = "📋 Edit Development Plan" if self.idp_data else "📋 Create Development Plan"
         idp_btn = tk.Button(buttons_frame, text=idp_text, 
                            command=self.show_idp_wizard,
                            font=("Segoe UI", 14, "bold"), bg="#9C27B0", fg="white",
-                           padx=60, pady=20, relief=tk.FLAT, cursor="hand2",
+                           width=button_width, pady=20, relief=tk.FLAT, cursor="hand2",
                            activebackground="#7B1FA2")
-        idp_btn.pack(pady=10, fill=tk.X)
+        idp_btn.pack(pady=10)
         
         # Stats and recent reviews section
         info_frame = tk.Frame(home, bg="#F5F5F5")
@@ -1536,12 +1634,15 @@ class CRRDFReviewApp:
             tk.Label(stats_frame, text="Ready to start tracking your development", 
                     font=("Segoe UI", 11), bg="#F5F5F5", fg="#757575").pack()
         
-        # Recent reviews list
-        recent_frame = tk.Frame(info_frame, bg="#F5F5F5")
-        recent_frame.pack(pady=10, padx=20, fill=tk.BOTH, expand=True)
+        # Recent reviews list - centered with max width
+        recent_container = tk.Frame(info_frame, bg="#F5F5F5")
+        recent_container.pack(pady=10, padx=20)
+        
+        recent_frame = tk.Frame(recent_container, bg="#F5F5F5")
+        recent_frame.pack()
         
         tk.Label(recent_frame, text="Recent Reviews:", 
-                font=("Segoe UI", 11, "bold"), bg="#F5F5F5", fg="#212121", anchor="w").pack(fill=tk.X, pady=(5, 10))
+                font=("Segoe UI", 11, "bold"), bg="#F5F5F5", fg="#212121", anchor="w").pack(anchor="w", pady=(5, 10))
         
         try:
             # Get recent reviews (exclude idp.json)
@@ -1556,23 +1657,23 @@ class CRRDFReviewApp:
                             date = data.get('metadata', {}).get('date', 'Unknown')
                             grade = data.get('metadata', {}).get('game_grade', 'Unknown')
                             
-                            review_frame = tk.Frame(recent_frame, bg="white", relief=tk.RAISED, bd=1)
-                            review_frame.pack(fill=tk.X, pady=2)
-                            
-                            review_btn = tk.Button(review_frame, 
-                                                  text=f"  • {date} - {grade}", 
-                                                  font=("Segoe UI", 10), bg="white", fg="#212121",
-                                                  anchor="w", relief=tk.FLAT, cursor="hand2",
+                            # Compact button with fixed width
+                            review_btn = tk.Button(recent_frame, 
+                                                  text=f"📅 {date} - {grade}", 
+                                                  font=("Segoe UI", 9), bg="#E3F2FD", fg="#1976D2",
+                                                  anchor="w", relief=tk.SOLID, bd=1, cursor="hand2",
+                                                  activebackground="#BBDEFB", activeforeground="#0D47A1",
+                                                  width=50, padx=10, pady=5,
                                                   command=lambda f=filepath: self.load_review_from_home(f))
-                            review_btn.pack(fill=tk.X, padx=10, pady=5)
+                            review_btn.pack(anchor="w", pady=2)
                     except:
                         pass
             else:
                 tk.Label(recent_frame, text="No reviews yet. Click 'New Review' to get started!", 
-                        font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(fill=tk.X)
+                        font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(anchor="w")
         except:
             tk.Label(recent_frame, text="No reviews found", 
-                    font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(fill=tk.X)
+                    font=("Segoe UI", 10), bg="#F5F5F5", fg="#757575", anchor="w").pack(anchor="w")
     
     def load_review_from_home(self, filepath):
         """Load a review from the home screen recent list"""
@@ -1611,9 +1712,33 @@ class CRRDFReviewApp:
         """Game metadata entry screen"""
         self.clear_content()
         
-        # Use regular frame instead of scrollable canvas (no scrolling needed)
-        frame = tk.Frame(self.content, bg="#FAFAFA")
-        frame.pack(fill=tk.BOTH, expand=True)
+        # Create scrollable canvas for metadata
+        canvas = tk.Canvas(self.content, bg="#FAFAFA", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.content, orient="vertical", command=canvas.yview)
+        frame = tk.Frame(canvas, bg="#FAFAFA")
+        
+        frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas_window = canvas.create_window((0, 0), window=frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width when window resizes
+        def update_canvas_width(event=None):
+            self.content.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        self.content.after(100, update_canvas_width)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Enable mousewheel scrolling
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
         
         tk.Label(frame, text="Game Information", font=("Segoe UI", 16, "bold"),
                 bg="#FAFAFA", fg="#212121").pack(pady=10)
@@ -1786,8 +1911,18 @@ class CRRDFReviewApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=1050)
+        canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width after initial display and on window resize
+        def update_canvas_width(event=None):
+            self.content.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        # Bind to root window configure event for resizing
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        
+        # Initial update after display
+        self.content.after(100, update_canvas_width)
         
         frame = scrollable_frame
         
@@ -1997,8 +2132,18 @@ class CRRDFReviewApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width after initial display and on window resize
+        def update_canvas_width(event=None):
+            self.content.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        # Bind to root window configure event for resizing
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        
+        # Initial update after display
+        self.content.after(100, update_canvas_width)
         
         # Title
         tk.Label(scrollable_frame, text="Game Focus Area Scoring", 
@@ -2334,8 +2479,18 @@ class CRRDFReviewApp:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Update canvas width after initial display and on window resize
+        def update_canvas_width(event=None):
+            scroll_container.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
+        
+        # Bind to root window configure event for resizing
+        self.root.bind("<Configure>", update_canvas_width, add="+")
+        
+        # Initial update after display
+        scroll_container.after(100, update_canvas_width)
         
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
