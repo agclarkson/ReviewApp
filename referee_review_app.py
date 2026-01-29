@@ -15,10 +15,10 @@ referee associations. Commercial use requires a separate license.
 For commercial licensing inquiries, contact:
 https://github.com/agclarkson/ReviewApp/issues
 
-Version: 2.1.1-alpha3
+Version: 2.1.4-alpha3
 """
 
-__version__ = "2.1.1-alpha3"
+__version__ = "2.1.4-alpha3"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
@@ -907,38 +907,20 @@ class CRRDFReviewApp:
         auto_filled_coach = self.config.get("coach_name", "")
         auto_filled_date = datetime.now().strftime("%Y-%m-%d")  # Today's date
         
-        # DEBUG: Print what we're checking
-        print(f"DEBUG - Checking progress:")
-        print(f"  Auto-filled referee: '{auto_filled_referee}'")
-        print(f"  Auto-filled coach: '{auto_filled_coach}'")
-        print(f"  Auto-filled date: '{auto_filled_date}'")
-        print(f"  Session metadata: {self.session.metadata}")
-        
         # Check metadata (excluding auto-filled referee/coach/date)
         metadata_progress = False
         for key, value in self.session.metadata.items():
-            print(f"  Checking {key}: '{value}'")
             if key == "referee" and value == auto_filled_referee:
-                print(f"    -> Skipping (auto-filled referee)")
                 continue  # Skip auto-filled referee
             if key == "coach" and value == auto_filled_coach:
-                print(f"    -> Skipping (auto-filled coach)")
                 continue  # Skip auto-filled coach
             if key == "date" and value == auto_filled_date:
-                print(f"    -> Skipping (auto-filled date)")
                 continue  # Skip auto-filled today's date
             if key == "date_completed" and value == auto_filled_date:
-                print(f"    -> Skipping (auto-filled date_completed)")
                 continue  # Skip auto-filled date_completed too
             if value:  # Has actual user-entered data
-                print(f"    -> PROGRESS DETECTED!")
                 metadata_progress = True
                 break
-        
-        print(f"  Metadata progress: {metadata_progress}")
-        print(f"  Reflections: {bool(self.session.reflections and any(self.session.reflections.values()))}")
-        print(f"  CRRDF reflections: {bool(self.session.crrdf_reflections)}")
-        print(f"  GFA scores: {bool(self.session.gfa_scores)}")
         
         # Check if there's ANY actual progress
         if (metadata_progress or 
@@ -946,8 +928,6 @@ class CRRDFReviewApp:
             self.session.crrdf_reflections or 
             self.session.gfa_scores):
             has_progress = True
-        
-        print(f"  FINAL has_progress: {has_progress}")
         
         if has_progress:
             # Review in progress - offer to resume
