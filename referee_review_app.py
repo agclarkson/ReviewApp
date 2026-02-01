@@ -15,10 +15,10 @@ referee associations. Commercial use requires a separate license.
 For commercial licensing inquiries, contact:
 https://github.com/agclarkson/ReviewApp/issues
 
-Version: 2.1.4-alpha3
+Version: 2.1.5-alpha4
 """
 
-__version__ = "2.1.4-alpha3"
+__version__ = "2.1.5-alpha4"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2025 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
@@ -153,15 +153,21 @@ CRRDF_QUESTIONS = {
         "questions": [
             {
                 "q": "How well did you apply the laws to keep the game safe?",
-                "prompts": ["Think about scrum safety", "Tackle height compliance", "Dangerous play management"]
+                "prompts": ["Think about scrum safety", "Tackle height compliance", "Dangerous play management"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "Were your decisions based on actual player actions rather than assumptions?",
-                "prompts": ["Pre-contest positioning", "Contest observation", "Post-contest management"]
+                "prompts": ["Pre-contest positioning", "Contest observation", "Post-contest management"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "How effectively did you apply game innovations (e.g., tackle height, scrum offside)?",
-                "prompts": ["Clarity on new laws", "Consistency of application", "Communication to players"]
+                "prompts": ["Clarity on new laws", "Consistency of application", "Communication to players"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             }
         ]
     },
@@ -170,19 +176,27 @@ CRRDF_QUESTIONS = {
         "questions": [
             {
                 "q": "Did you use tactical awareness in your decision-making?",
-                "prompts": ["Impact vs. relevance of infringements", "Pressure and dominance assessment", "Intentional vs. accidental actions"]
+                "prompts": ["Impact vs. relevance of infringements", "Pressure and dominance assessment", "Intentional vs. accidental actions"],
+                "has_scale": True,
+                "level": "Referee Level 4, 5"
             },
             {
                 "q": "How appropriate was your advantage application?",
-                "prompts": ["Team skill levels considered", "Game flow maintained", "Tactical vs. territorial advantage"]
+                "prompts": ["Team skill levels considered", "Game flow maintained", "Tactical vs. territorial advantage"],
+                "has_scale": True,
+                "level": "Referee Level 3, 4, 5"
             },
             {
                 "q": "Were your running lines and positioning optimal for decision-making?",
-                "prompts": ["Exit points from phases", "Contestable moments coverage", "Adaptation to game shape"]
+                "prompts": ["Exit points from phases", "Contestable moments coverage", "Adaptation to game shape"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "Did you show appropriate empathy based on game context?",
-                "prompts": ["Skill level consideration", "Team tactics awareness", "Weather/conditions impact"]
+                "prompts": ["Skill level consideration", "Team tactics awareness", "Weather/conditions impact"],
+                "has_scale": True,
+                "level": "Referee Level 2, 3, 4, 5"
             }
         ]
     },
@@ -191,19 +205,27 @@ CRRDF_QUESTIONS = {
         "questions": [
             {
                 "q": "Did you recognize and apply the right level of management for this game?",
-                "prompts": ["Player temperament assessment", "Law knowledge and compliance levels", "Connection with captains"]
+                "prompts": ["Player temperament assessment", "Law knowledge and compliance levels", "Connection with captains"],
+                "has_scale": True,
+                "level": "Referee Level 2, 3, 4, 5"
             },
             {
                 "q": "How effectively did you manage player safety?",
-                "prompts": ["Recognition of dangerous play", "Proactive safety management", "Work with key players"]
+                "prompts": ["Recognition of dangerous play", "Proactive safety management", "Work with key players"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "What range of management strategies did you use?",
-                "prompts": ["Captain engagement", "Verbal management balance", "Escalation when needed"]
+                "prompts": ["Captain engagement", "Verbal management balance", "Escalation when needed"],
+                "has_scale": False,  # NO SCALE
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "Did you identify and address game trends?",
-                "prompts": ["Team tactics recognition", "Appropriate escalation", "Individual player management"]
+                "prompts": ["Team tactics recognition", "Appropriate escalation", "Individual player management"],
+                "has_scale": True,
+                "level": "Referee Level 3, 4, 5"
             }
         ]
     },
@@ -212,15 +234,21 @@ CRRDF_QUESTIONS = {
         "questions": [
             {
                 "q": "How effective was your pre-game preparation?",
-                "prompts": ["Mental preparation", "Game plan development", "Kit and logistics organization"]
+                "prompts": ["Mental preparation", "Game plan development", "Kit and logistics organization"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             },
             {
                 "q": "Did you identify and mitigate any 'clutter' affecting performance?",
-                "prompts": ["External pressures recognized", "Strategies used to minimize impact", "Focus maintenance"]
+                "prompts": ["External pressures recognized", "Strategies used to minimize impact", "Focus maintenance"],
+                "has_scale": True,
+                "level": "Referee Level 4, 5"
             },
             {
                 "q": "What key soft skills did you demonstrate?",
-                "prompts": ["Fortitude in big moments", "Adaptability to game changes", "Resilience after challenges", "Presence and character"]
+                "prompts": ["Fortitude in big moments", "Adaptability to game changes", "Resilience after challenges", "Presence and character"],
+                "has_scale": False,  # NO SCALE
+                "level": "Referee Level 3, 4, 5"
             }
         ]
     },
@@ -229,7 +257,9 @@ CRRDF_QUESTIONS = {
         "questions": [
             {
                 "q": "Did you keep up with play throughout the game?",
-                "prompts": ["Fitness sufficiency", "Positioning for key moments", "Energy management"]
+                "prompts": ["Fitness sufficiency", "Positioning for key moments", "Energy management"],
+                "has_scale": True,
+                "level": "Referee Level 1, 2, 3, 4, 5"
             }
         ]
     }
@@ -255,7 +285,7 @@ GFA_CATEGORIES = {
     ],
     "Management": [
         ("Advantage", "Advantage application: territorial vs tactical, team skill consideration, materiality, clear calls"),
-        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, TMO, managing tensions, big calls")
+        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, managing tensions, big calls")
     ]
 }
 
@@ -368,7 +398,9 @@ class ReviewSession:
             "taking_forward": ""
         }
         self.crrdf_reflections = {}
+        self.crrdf_scores = {}  # Store scores for questions with scales
         self.gfa_scores = {}
+        self.gfa_comments = ""  # Additional comments for GFA section
         self.coach_feedback = ""
 
 
@@ -1141,13 +1173,22 @@ class CRRDFReviewApp:
         # Create dashboard window
         dashboard = tk.Toplevel(self.root)
         dashboard.title("Analytics Dashboard")
-        dashboard.geometry("1200x800")
-        dashboard.transient(self.root)
         
-        # Center the dialog
-        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - 600
-        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - 400
-        dashboard.geometry(f"1200x800+{x}+{y}")
+        # Responsive sizing based on screen
+        screen_width = dashboard.winfo_screenwidth()
+        screen_height = dashboard.winfo_screenheight()
+        
+        # Use 80% of screen or reasonable max
+        window_width = min(1200, int(screen_width * 0.8))
+        window_height = min(800, int(screen_height * 0.8))
+        
+        # Center the window
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+        
+        dashboard.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        dashboard.transient(self.root)
+        dashboard.minsize(800, 600)  # Minimum size
         
         # Header
         header = tk.Frame(dashboard, bg="#1976D2", height=60)
@@ -1171,8 +1212,8 @@ class CRRDFReviewApp:
             # Update after a short delay to ensure canvas has correct width
             dashboard.after(10, lambda: canvas.itemconfig(canvas_window, width=canvas.winfo_width()))
         
-        # Bind to root window configure event for resizing
-        self.root.bind("<Configure>", update_canvas_width, add="+")
+        # Bind to dashboard window configure event for resizing
+        dashboard.bind("<Configure>", update_canvas_width, add="+")
         
         # Initial update after display
         dashboard.after(100, update_canvas_width)
@@ -2028,6 +2069,14 @@ class CRRDFReviewApp:
         tk.Label(frame, text=progress_text, font=("Segoe UI", 10), 
                 bg="#FAFAFA", fg="#757575").pack(pady=5)
         
+        # CRRDF Level indicator
+        if 'level' in question_data:
+            level_frame = tk.Frame(frame, bg="#E8F5E9", relief=tk.RIDGE, bd=1)
+            level_frame.pack(pady=5, padx=20, fill=tk.X)
+            tk.Label(level_frame, text=f"📊 CRRDF Level: {question_data['level']}", 
+                    font=("Segoe UI", 9, "bold"), bg="#E8F5E9", fg="#2E7D32",
+                    padx=10, pady=5).pack()
+        
         # Question
         tk.Label(frame, text=question_data['q'], font=("Segoe UI", 13, "bold"),
                 bg="#FAFAFA", fg="#212121", wraplength=800, justify=tk.LEFT).pack(pady=15, padx=20)
@@ -2044,15 +2093,59 @@ class CRRDFReviewApp:
             tk.Label(prompt_frame, text=prompt, font=("Segoe UI", 10),
                     bg="#FAFAFA", fg="#757575").pack(side=tk.LEFT, padx=5)
         
-        # Answer area
-        tk.Label(frame, text="\nYour Response:", font=("Segoe UI", 10, "bold"),
-                bg="#FAFAFA", fg="#212121").pack(anchor=tk.W, padx=20, pady=(15, 5))
-        
-        # Get or create text widget for this question
+        # Scale/Slider if this question has one
         key = f"{pillar_name}_{question_index}"
         if not hasattr(self, 'pillar_answers'):
             self.pillar_answers = {}
+        if not hasattr(self, 'pillar_scores'):
+            self.pillar_scores = {}
         
+        if question_data.get('has_scale', False):
+            # Add scale slider
+            scale_frame = tk.Frame(frame, bg="#FAFAFA")
+            scale_frame.pack(pady=15, padx=20, fill=tk.X)
+            
+            tk.Label(scale_frame, text="Your Score:", font=("Segoe UI", 10, "bold"),
+                    bg="#FAFAFA", fg="#212121").pack(anchor=tk.W)
+            
+            # Score display and slider
+            score_var = tk.IntVar(value=self.pillar_scores.get(key, 3))
+            
+            score_display = tk.Label(scale_frame, text=f"{score_var.get()}", 
+                                    font=("Segoe UI", 20, "bold"), bg="#FAFAFA", fg="#1976D2")
+            score_display.pack(pady=10)
+            
+            def update_score(val):
+                score_var.set(int(float(val)))
+                score_display.config(text=str(score_var.get()))
+            
+            slider = tk.Scale(scale_frame, from_=1, to=5, orient=tk.HORIZONTAL,
+                            command=update_score, variable=score_var,
+                            length=400, font=("Segoe UI", 10), bg="#FAFAFA",
+                            highlightthickness=0, troughcolor="#E0E0E0",
+                            activebackground="#1976D2")
+            slider.pack(pady=5)
+            
+            # Scale labels
+            labels_frame = tk.Frame(scale_frame, bg="#FAFAFA")
+            labels_frame.pack(fill=tk.X)
+            tk.Label(labels_frame, text="1 - Poor", font=("Segoe UI", 9),
+                    bg="#FAFAFA", fg="#757575").pack(side=tk.LEFT, padx=5)
+            tk.Label(labels_frame, text="5 - Excellent", font=("Segoe UI", 9),
+                    bg="#FAFAFA", fg="#757575").pack(side=tk.RIGHT, padx=5)
+            
+            self.current_score_var = score_var
+            self.current_score_key = key
+            
+            # Justify text
+            tk.Label(frame, text="\nJustify your score:", font=("Segoe UI", 10, "bold"),
+                    bg="#FAFAFA", fg="#212121").pack(anchor=tk.W, padx=20, pady=(15, 5))
+        else:
+            # No scale - regular response
+            tk.Label(frame, text="\nYour Response:", font=("Segoe UI", 10, "bold"),
+                    bg="#FAFAFA", fg="#212121").pack(anchor=tk.W, padx=20, pady=(15, 5))
+        
+        # Answer text area
         text = PlaceholderText(frame, placeholder="Be specific with examples, include time stamps where relevant...",
                               height=6, width=80, font=("Segoe UI", 10), wrap=tk.WORD)
         text.pack(padx=20, pady=5)
@@ -2069,12 +2162,21 @@ class CRRDFReviewApp:
         nav = tk.Frame(frame, bg="#FAFAFA")
         nav.pack(pady=20)
         
-        if question_index > 0:
+        # Back button - goes to previous question or previous pillar
+        if question_index > 0 or self.current_pillar_index > 0:
+            if question_index > 0:
+                # Previous question in same pillar
+                back_cmd = lambda: [self.save_current_answer(), 
+                                   self.show_pillar_question(pillar_name, question_index - 1)]
+            else:
+                # Go back to previous pillar's last question
+                back_cmd = lambda: [self.save_current_answer(), self.go_to_previous_pillar()]
+            
             tk.Button(nav, text="← Previous", 
-                     command=lambda: [self.save_current_answer(), 
-                                    self.show_pillar_question(pillar_name, question_index - 1)],
+                     command=back_cmd,
                      font=("Segoe UI", 10), bg="#E0E0E0", fg="#212121",
                      padx=15, pady=8, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        
         tk.Button(nav, text="Next →" if question_index < len(pillar_data['questions']) - 1 else "Complete Pillar →",
                  command=lambda: [self.save_current_answer(), 
                                 self.show_pillar_question(pillar_name, question_index + 1)],
@@ -2082,21 +2184,40 @@ class CRRDFReviewApp:
                  padx=20, pady=10, relief=tk.FLAT, cursor="hand2").pack(side=tk.LEFT, padx=5)
     
     def save_current_answer(self):
-        """Save the current answer"""
+        """Save the current answer and score"""
         if hasattr(self, 'current_answer_widget') and hasattr(self, 'current_answer_key'):
             answer = self.current_answer_widget.get_value()
             self.pillar_answers[self.current_answer_key] = answer
+            
+            # Save score if exists
+            if hasattr(self, 'current_score_var') and hasattr(self, 'current_score_key'):
+                score = self.current_score_var.get()
+                self.pillar_scores[self.current_score_key] = score
             
             # Also save to session
             if not hasattr(self.session, 'crrdf_reflections'):
                 self.session.crrdf_reflections = {}
             self.session.crrdf_reflections[self.current_answer_key] = answer
+            
+            # Save score to session
+            if hasattr(self, 'current_score_var'):
+                if not hasattr(self.session, 'crrdf_scores'):
+                    self.session.crrdf_scores = {}
+                self.session.crrdf_scores[self.current_answer_key] = self.current_score_var.get()
     
     def previous_pillar(self):
         """Go back to previous pillar"""
         if self.current_pillar_index > 0:
             self.current_pillar_index -= 1
             self.show_pillar_intro()
+    
+    def go_to_previous_pillar(self):
+        """Go to the last question of the previous pillar"""
+        if self.current_pillar_index > 0:
+            self.current_pillar_index -= 1
+            prev_pillar_name = self.pillars[self.current_pillar_index]
+            last_q_index = len(CRRDF_QUESTIONS[prev_pillar_name]['questions']) - 1
+            self.show_pillar_question(prev_pillar_name, last_q_index)
     
     def show_gfa_scoring(self):
         """GFA scoring interface"""
@@ -2181,6 +2302,34 @@ class CRRDFReviewApp:
                                   bg="#FFFFFF", font=("Segoe UI", 9),
                                   selectcolor="#4CAF50").pack(side=tk.LEFT, padx=3)
         
+        # Note about answering relevant questions
+        note_frame = tk.Frame(scrollable_frame, bg="#FFF9C4", relief=tk.RIDGE, bd=1)
+        note_frame.pack(pady=15, padx=20, fill=tk.X)
+        
+        tk.Label(note_frame, text="ℹ️ Note:", font=("Segoe UI", 10, "bold"),
+                bg="#FFF9C4", fg="#F57F17").pack(anchor=tk.W, padx=10, pady=(5, 2))
+        tk.Label(note_frame, text="Answer questions relevant to your level and the game you refereed.", 
+                font=("Segoe UI", 10), bg="#FFF9C4", fg="#212121",
+                wraplength=700, justify=tk.LEFT).pack(anchor=tk.W, padx=10, pady=(0, 5))
+        
+        # Comments/Notes section
+        tk.Label(scrollable_frame, text="Additional Comments:", font=("Segoe UI", 11, "bold"),
+                bg="#FAFAFA", fg="#212121").pack(anchor=tk.W, padx=20, pady=(15, 5))
+        
+        tk.Label(scrollable_frame, text="Add any additional notes, observations, or context about your performance:", 
+                font=("Segoe UI", 9), bg="#FAFAFA", fg="#757575").pack(anchor=tk.W, padx=20, pady=(0, 5))
+        
+        self.gfa_comments = PlaceholderText(scrollable_frame, 
+                                           placeholder="e.g., Weather conditions, injury stoppages, notable incidents, areas for improvement...",
+                                           height=4, width=80, font=("Segoe UI", 10), wrap=tk.WORD)
+        self.gfa_comments.pack(padx=20, pady=5)
+        
+        # Restore previous comments if they exist
+        if hasattr(self.session, 'gfa_comments') and self.session.gfa_comments:
+            self.gfa_comments.delete("1.0", tk.END)
+            self.gfa_comments.insert("1.0", self.session.gfa_comments)
+            self.gfa_comments.config(fg=self.gfa_comments.default_fg_color)
+        
         # Navigation
         nav = tk.Frame(scrollable_frame, bg="#FAFAFA")
         nav.pack(pady=20)
@@ -2213,6 +2362,10 @@ class CRRDFReviewApp:
         # Save GFA scores
         for key, var in self.gfa_vars.items():
             self.session.gfa_scores[key] = var.get()
+        
+        # Save GFA comments
+        if hasattr(self, 'gfa_comments'):
+            self.session.gfa_comments = self.gfa_comments.get_value()
         
         # Auto-save JSON first
         json_filename = self.save_review_json()
@@ -2333,9 +2486,19 @@ class CRRDFReviewApp:
                 
                 for q_idx, question_data in enumerate(pillar_data['questions']):
                     key = f"{pillar_name}_{q_idx}"
+                    
+                    # Question text
                     ws.cell(row, 1, f"Q: {question_data['q']}").font = Font(bold=True)
+                    
+                    # Add score if this question has a scale
+                    if question_data.get('has_scale', False) and hasattr(self, 'pillar_scores'):
+                        score = self.pillar_scores.get(key, "")
+                        ws.cell(row, 7, f"Score: {score}/5").font = Font(bold=True)
+                        ws.cell(row, 7).fill = PatternFill(start_color="E3F2FD", end_color="E3F2FD", fill_type="solid")
+                    
                     row += 1
                     
+                    # Answer
                     ws.merge_cells(f'B{row}:G{row}')
                     ws.cell(row, 2, self.pillar_answers.get(key, ""))
                     ws.cell(row, 2).alignment = Alignment(wrap_text=True, vertical='top')
@@ -2366,6 +2529,16 @@ class CRRDFReviewApp:
                 row += 1
         
         row += 1
+        
+        # GFA Comments
+        if hasattr(self.session, 'gfa_comments') and self.session.gfa_comments:
+            ws.cell(row, 1, "Additional GFA Comments:").font = Font(bold=True)
+            row += 1
+            ws.merge_cells(f'A{row}:G{row}')
+            ws.cell(row, 1, self.session.gfa_comments)
+            ws.cell(row, 1).alignment = Alignment(wrap_text=True, vertical='top')
+            row += 1
+            row += 1
         
         # Rating Scale
         ws.cell(row, 1, "Rating Scale").font = subheader_font
@@ -2405,7 +2578,7 @@ class CRRDFReviewApp:
         
         # Section names and questions
         sections = {
-            "club": {"title": "Club Level", "desc": "Your current club rugby status"},
+            "club": {"title": "Club Level", "desc": "Your current club rugby experience"},
             "rep": {"title": "Representative Level", "desc": "Your rep rugby involvement"},
             "aspirations": {"title": "Aspirations", "desc": "Your goals and targets"},
             "fitness": {"title": "Fitness Plan", "desc": "Physical preparation"},
@@ -2571,7 +2744,7 @@ class CRRDFReviewApp:
         questions = {
             "club": {
                 "level": {
-                    "text": "What level do you currently referee at club rugby?",
+                    "text": "What grades do you currently referee at club rugby?",
                     "type": "text",
                     "help": "e.g., Division 1, U21 Colts, etc."
                 },
@@ -2586,7 +2759,7 @@ class CRRDFReviewApp:
                     "help": "Be specific about what you find difficult"
                 },
                 "goal": {
-                    "text": "Where do you want to be by end of season?",
+                    "text": "What does success look like for this season?",
                     "type": "text",
                     "help": "Be specific - which grade? What role?"
                 }
@@ -2634,10 +2807,10 @@ class CRRDFReviewApp:
                 "bronco_done": {
                     "text": "Have you done a Bronco test?",
                     "type": "text",
-                    "help": "Yes/No - if yes, what was your time?"
+                    "help": "Yes/No"
                 },
                 "bronco_time": {
-                    "text": "Current Bronco time (if applicable):",
+                    "text": "Latest Bronco time (if applicable):",
                     "type": "text",
                     "help": "e.g., 6:00"
                 },
@@ -2647,9 +2820,9 @@ class CRRDFReviewApp:
                     "help": "What time are you aiming for? e.g., 5:30"
                 },
                 "training_frequency": {
-                    "text": "How often will you train?",
+                    "text": "How will you effectively train?",
                     "type": "text",
-                    "help": "Be realistic - days per week"
+                    "help": "Be realistic"
                 },
                 "training_types": {
                     "text": "What training will you do?",
@@ -2662,7 +2835,7 @@ class CRRDFReviewApp:
                     "help": "What do you want to achieve? Be specific and measurable"
                 },
                 "fitness_obstacles": {
-                    "text": "What might stop you training? How will you overcome it?",
+                    "text": "What barriers are there to your training? How will you overcome it?",
                     "type": "text",
                     "help": "Think about obstacles and solutions now"
                 }
@@ -2686,7 +2859,7 @@ class CRRDFReviewApp:
                 "plan": {
                     "text": "Your law development plan:",
                     "type": "text",
-                    "help": "How often will you study? What resources? Who can help?"
+                    "help": "How  will you build your law knowledge? What resources? Who can help?"
                 }
             },
             "mental": {
@@ -2701,9 +2874,9 @@ class CRRDFReviewApp:
                     "help": "e.g., Nerves, pressure, mistakes, external factors"
                 },
                 "plan": {
-                    "text": "How will you build mental resilience?",
+                    "text": "How will you develop mental resilience?",
                     "type": "text",
-                    "help": "What will you work on? Who can support you?"
+                    "help": "What will you work on? How can you support yourself?"
                 }
             },
             "focus1": {
@@ -3088,7 +3261,7 @@ def show_splash_screen(parent):
     # Alpha Release badge
     alpha_frame = tk.Frame(frame, bg="#FF9800", relief=tk.RAISED, bd=1)
     alpha_frame.pack(pady=5)
-    tk.Label(alpha_frame, text="ALPHA RELEASE 3", 
+    tk.Label(alpha_frame, text="ALPHA RELEASE 4", 
             font=("Segoe UI", 9, "bold"), bg="#FF9800", fg="white",
             padx=15, pady=3).pack()
     
