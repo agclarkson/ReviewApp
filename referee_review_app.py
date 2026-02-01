@@ -2300,8 +2300,11 @@ class CRRDFReviewApp:
                 rating_frame = tk.Frame(aspect_frame, bg="#FFFFFF")
                 rating_frame.pack(side=tk.RIGHT)
                 
-                var = tk.IntVar(value=3)
-                self.gfa_vars[f"{category}_{aspect_name}"] = var
+                key = f"{category}_{aspect_name}"
+                # Use saved score if exists, otherwise default to 3
+                saved_score = self.session.gfa_scores.get(key, 3)
+                var = tk.IntVar(value=saved_score)
+                self.gfa_vars[key] = var
                 
                 for i in range(1, 6):
                     tk.Radiobutton(rating_frame, text=str(i), variable=var, value=i,
