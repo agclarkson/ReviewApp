@@ -285,7 +285,7 @@ GFA_CATEGORIES = {
     ],
     "Management": [
         ("Advantage", "Advantage application: territorial vs tactical, team skill consideration, materiality, clear calls"),
-        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, managing tensions, big calls")
+        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, TMO, managing tensions, big calls")
     ]
 }
 
@@ -775,7 +775,9 @@ class CRRDFReviewApp:
                 "difficulty": self.session.difficulty,
                 "reflections": self.session.reflections,
                 "crrdf_reflections": self.session.crrdf_reflections if hasattr(self.session, 'crrdf_reflections') else {},
+                "crrdf_scores": self.session.crrdf_scores if hasattr(self.session, 'crrdf_scores') else {},
                 "gfa_scores": self.session.gfa_scores,
+                "gfa_comments": self.session.gfa_comments if hasattr(self.session, 'gfa_comments') else "",
                 "coach_feedback": self.session.coach_feedback
             }
             
@@ -807,11 +809,15 @@ class CRRDFReviewApp:
             self.session.difficulty = review_data.get('difficulty', 5)
             self.session.reflections = review_data.get('reflections', {})
             self.session.crrdf_reflections = review_data.get('crrdf_reflections', {})
+            self.session.crrdf_scores = review_data.get('crrdf_scores', {})
             self.session.gfa_scores = review_data.get('gfa_scores', {})
+            self.session.gfa_comments = review_data.get('gfa_comments', '')
+            self.session.coach_feedback = review_data.get('coach_feedback', '')
             self.session.coach_feedback = review_data.get('coach_feedback', "")
             
-            # Also populate pillar_answers for display
+            # Also populate pillar_answers and pillar_scores for display
             self.pillar_answers = review_data.get('crrdf_reflections', {}).copy()
+            self.pillar_scores = review_data.get('crrdf_scores', {}).copy()
             
             return True
         except Exception as e:
