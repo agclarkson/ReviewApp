@@ -15,10 +15,10 @@ referee associations. Commercial use requires a separate license.
 For commercial licensing inquiries, contact:
 https://github.com/agclarkson/ReviewApp/issues
 
-Version: 2.1.5-alpha4
+Version: 2.1.9-alpha4
 """
 
-__version__ = "2.1.8-alpha4"
+__version__ = "2.1.9-alpha4"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2026 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
@@ -285,7 +285,7 @@ GFA_CATEGORIES = {
     ],
     "Management": [
         ("Advantage", "Advantage application: territorial vs tactical, team skill consideration, materiality, clear calls"),
-        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, TMO, managing tensions, big calls")
+        ("Foul Play/Big Moments", "Foul play & pressure moments: cards, penalty tries, managing tensions, big calls")
     ]
 }
 
