@@ -18,7 +18,7 @@ https://github.com/agclarkson/ReviewApp/issues
 Version: 2.1.5-alpha4
 """
 
-__version__ = "2.1.7-alpha4"
+__version__ = "2.1.8-alpha4"
 __author__ = "Andrew Clarkson"
 __copyright__ = "Copyright © 2026 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
@@ -2737,7 +2737,7 @@ class CRRDFReviewApp:
                 entry.bind("<Tab>", focus_next)
                 
                 # Load existing value
-                field_name = f"{section_key}_{q_id}"
+                field_name = question.get("field", f"{section_key}_{q_id}")
                 value = getattr(self.idp_data, field_name, "")
                 if value:
                     entry.insert("1.0", value)
@@ -2752,7 +2752,7 @@ class CRRDFReviewApp:
                 combo.pack(fill=tk.X, pady=5)
                 
                 # Load existing value
-                field_name = f"{section_key}_{q_id}"
+                field_name = question.get("field", f"{section_key}_{q_id}")
                 value = getattr(self.idp_data, field_name, "")
                 if value:
                     var.set(value)
@@ -2805,59 +2805,70 @@ class CRRDFReviewApp:
                 "ultimate_goal": {
                     "text": "What's your ultimate refereeing goal?",
                     "type": "text",
-                    "help": "Dream big - where do you ultimately want to referee?"
+                    "help": "Dream big - where do you ultimately want to referee?",
+                    "field": "ultimate_goal"  # Direct field name
                 },
                 "season_goal": {
                     "text": "What's realistic for this season?",
                     "type": "text",
-                    "help": "Break your big goal into yearly steps"
+                    "help": "Break your big goal into yearly steps",
+                    "field": "season_goal"  # Direct field name
                 },
                 "success_criteria": {
                     "text": "What would success look like this year?",
                     "type": "text",
-                    "help": "How will you know you've progressed?"
+                    "help": "How will you know you've progressed?",
+                    "field": "success_criteria"  # Direct field name
                 }
             },
             "fitness": {
                 "level": {
                     "text": "Can you keep up with play for 80 minutes?",
                     "type": "text",
-                    "help": "Be honest about your current fitness level"
+                    "help": "Be honest about your current fitness level",
+                    "field": "fitness_level"  # Correct field name
                 },
                 "bronco_done": {
                     "text": "Have you done a Bronco test?",
                     "type": "text",
-                    "help": "Yes/No"
+                    "help": "Yes/No",
+                    "field": "bronco_done"  # Correct field name
                 },
                 "bronco_time": {
                     "text": "Latest Bronco time (if applicable):",
                     "type": "text",
-                    "help": "e.g., 6:00"
+                    "help": "e.g., 6:00",
+                    "field": "bronco_time"  # Correct field name
                 },
                 "bronco_target": {
                     "text": "Target Bronco time:",
                     "type": "text",
-                    "help": "What time are you aiming for? e.g., 5:30"
+                    "help": "What time are you aiming for? e.g., 5:30",
+                    "field": "bronco_target"  # Correct field name
                 },
                 "training_frequency": {
                     "text": "How will you effectively train?",
                     "type": "text",
-                    "help": "Be realistic"
+                    "help": "Be realistic",
+                    "field": "training_frequency"  # Correct field name
                 },
                 "training_types": {
                     "text": "What training will you do?",
                     "type": "text",
-                    "help": "e.g., Running, gym, sport (squash, etc.)"
+                    "help": "e.g., Running, gym, sport (squash, etc.)",
+                    "field": "training_types"  # Correct field name
                 },
                 "fitness_target": {
                     "text": "Your specific fitness target:",
                     "type": "text",
-                    "help": "What do you want to achieve? Be specific and measurable"
+                    "help": "What do you want to achieve? Be specific and measurable",
+                    "field": "fitness_target"  # Correct field name
                 },
                 "fitness_obstacles": {
                     "text": "What barriers are there to your training? How will you overcome it?",
                     "type": "text",
-                    "help": "Think about obstacles and solutions now"
+                    "help": "Think about obstacles and solutions now",
+                    "field": "fitness_obstacles"  # Correct field name
                 }
             },
             "law": {
@@ -3214,12 +3225,16 @@ class CRRDFReviewApp:
                 focus1_content.append(f"Category: {self.idp_data.focus1_category}")
             if self.idp_data.focus1_area:
                 focus1_content.append(f"Area: {self.idp_data.focus1_area}")
+            if self.idp_data.focus1_why:
+                focus1_content.append(f"Why: {self.idp_data.focus1_why}")
             if self.idp_data.focus1_goal:
                 focus1_content.append(f"Goal: {self.idp_data.focus1_goal}")
             if self.idp_data.focus1_how:
                 focus1_content.append(f"How: {self.idp_data.focus1_how}")
             if self.idp_data.focus1_track:
                 focus1_content.append(f"Track: {self.idp_data.focus1_track}")
+            if self.idp_data.focus1_obstacles:
+                focus1_content.append(f"Obstacles: {self.idp_data.focus1_obstacles}")
             
             # Build focus area 2 content
             focus2_content = []
