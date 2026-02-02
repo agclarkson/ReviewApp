@@ -18,9 +18,9 @@ https://github.com/agclarkson/ReviewApp/issues
 Version: 2.1.5-alpha4
 """
 
-__version__ = "2.1.5-alpha4"
+__version__ = "2.1.7-alpha4"
 __author__ = "Andrew Clarkson"
-__copyright__ = "Copyright © 2025 Andrew Clarkson"
+__copyright__ = "Copyright © 2026 Andrew Clarkson"
 __license__ = "Personal Use - Commercial license available"
 
 # Application Constants
@@ -290,8 +290,8 @@ GFA_CATEGORIES = {
 }
 
 RATING_SCALE = {
-    1: "Unacceptable - Fails to demonstrate required awareness. Errors significantly impacted the game.",
-    2: "Below Standard - Limited awareness. Errors had negative influence on the game.",
+    1: "Beginning To - Fails to demonstrate required awareness. Errors significantly impacted the game.",
+    2: "Developing - Limited awareness. Errors had negative influence on the game.",
     3: "Satisfactory - Adequate level. Minor errors didn't materially affect the game. Meets minimum expectations.",
     4: "Sound - Good awareness and execution. Generally accurate and timely. Contributed positively.",
     5: "Excellent - Consistently high level. Accurate, proactive, adds clear value. Sets best practice example."
@@ -2117,13 +2117,32 @@ class CRRDFReviewApp:
             # Score display and slider
             score_var = tk.IntVar(value=self.pillar_scores.get(key, 3))
             
-            score_display = tk.Label(scale_frame, text=f"{score_var.get()}", 
+            # Score labels dictionary
+            score_meanings = {
+                1: "Beginning To",
+                2: "Developing",
+                3: "Satisfactory",
+                4: "Sound",
+                5: "Excellent"
+            }
+            
+            # Score display with meaning
+            score_display_frame = tk.Frame(scale_frame, bg="#FAFAFA")
+            score_display_frame.pack(pady=10)
+            
+            score_display = tk.Label(score_display_frame, text=f"{score_var.get()}", 
                                     font=("Segoe UI", 20, "bold"), bg="#FAFAFA", fg="#1976D2")
-            score_display.pack(pady=10)
+            score_display.pack(side=tk.LEFT)
+            
+            score_meaning = tk.Label(score_display_frame, text=f"- {score_meanings[score_var.get()]}", 
+                                    font=("Segoe UI", 14), bg="#FAFAFA", fg="#757575")
+            score_meaning.pack(side=tk.LEFT, padx=(10, 0))
             
             def update_score(val):
-                score_var.set(int(float(val)))
-                score_display.config(text=str(score_var.get()))
+                score_val = int(float(val))
+                score_var.set(score_val)
+                score_display.config(text=str(score_val))
+                score_meaning.config(text=f"- {score_meanings[score_val]}")
             
             slider = tk.Scale(scale_frame, from_=1, to=5, orient=tk.HORIZONTAL,
                             command=update_score, variable=score_var,
@@ -2131,14 +2150,6 @@ class CRRDFReviewApp:
                             highlightthickness=0, troughcolor="#E0E0E0",
                             activebackground="#1976D2")
             slider.pack(pady=5)
-            
-            # Scale labels
-            labels_frame = tk.Frame(scale_frame, bg="#FAFAFA")
-            labels_frame.pack(fill=tk.X)
-            tk.Label(labels_frame, text="1 - Poor", font=("Segoe UI", 9),
-                    bg="#FAFAFA", fg="#757575").pack(side=tk.LEFT, padx=5)
-            tk.Label(labels_frame, text="5 - Excellent", font=("Segoe UI", 9),
-                    bg="#FAFAFA", fg="#757575").pack(side=tk.RIGHT, padx=5)
             
             self.current_score_var = score_var
             self.current_score_key = key
