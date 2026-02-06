@@ -57,7 +57,13 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS - create .app bundle (remove --onefile for proper .app)
-            pyinstaller --windowed --name "Rugby Referee Review" --icon icon.icns referee_review_app.py
+            # Try to use icon if it exists, otherwise build without it
+            if [ -f "icon.icns" ]; then
+              pyinstaller --windowed --name "Rugby Referee Review" --icon icon.icns referee_review_app.py
+            else
+              echo "Warning: icon.icns not found, building without icon"
+              pyinstaller --windowed --name "Rugby Referee Review" referee_review_app.py
+            fi
           else
             # Linux - use PNG
             pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" --icon icon_512.png referee_review_app.py
