@@ -56,9 +56,8 @@ jobs:
         if: matrix.os != 'windows-latest'
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            # Convert iconset to icns for macOS
-            iconutil -c icns icon.iconset -o icon.icns
-            pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" --icon icon.icns referee_review_app.py
+            # macOS - create .app bundle (remove --onefile for proper .app)
+            pyinstaller --windowed --name "Rugby Referee Review" --icon icon.icns referee_review_app.py
           else
             # Linux - use PNG
             pyinstaller --onefile --windowed --name "${{ matrix.exe_name }}" --icon icon_512.png referee_review_app.py
@@ -79,7 +78,13 @@ jobs:
       - name: Copy files (macOS/Linux)
         if: matrix.os != 'windows-latest'
         run: |
-          cp "dist/${{ matrix.exe_name }}" release/
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            # macOS - copy the .app bundle
+            cp -r "dist/Rugby Referee Review.app" release/
+          else
+            # Linux - copy executable
+            cp "dist/${{ matrix.exe_name }}" release/
+          fi
           cp README.md release/ 2>/dev/null || true
           cp QUICK_START.md release/ 2>/dev/null || true
 
@@ -92,7 +97,14 @@ jobs:
       - name: Package macOS release
         if: matrix.os == 'macos-latest'
         run: |
-          cd release && zip -r ../${{ matrix.asset_name }} *
+          # Create DMG for better macOS distribution
+          hdiutil create -volname "Rugby Referee Review" \
+            -srcfolder "release/Rugby Referee Review.app" \
+            -ov -format UDZO \
+            rugby-referee-review-macos.dmg
+          
+          # Also create zip as backup
+          cd release && zip -r ../rugby-referee-review-macos.zip *
 
       - name: Package Linux release
         if: matrix.os == 'ubuntu-latest'
@@ -103,7 +115,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.asset_name }}
+          path: |
+            ${{ matrix.asset_name }}
+            ${{ matrix.os == 'macos-latest' && 'rugby-referee-review-macos.dmg' || '' }}
 
   release:
     name: Create GitHub Release
@@ -128,6 +142,7 @@ jobs:
               --title "Rugby Referee Review $TAG_NAME" \
               --notes-file "RELEASE_NOTES.md" \
               rugby-referee-review-windows/rugby-referee-review-windows.zip \
+              rugby-referee-review-macos/rugby-referee-review-macos.dmg \
               rugby-referee-review-macos/rugby-referee-review-macos.zip \
               rugby-referee-review-linux/rugby-referee-review-linux.tar.gz
           else
@@ -135,6 +150,7 @@ jobs:
               --title "Rugby Referee Review $TAG_NAME" \
               --notes "Download the version for your operating system." \
               rugby-referee-review-windows/rugby-referee-review-windows.zip \
+              rugby-referee-review-macos/rugby-referee-review-macos.dmg \
               rugby-referee-review-macos/rugby-referee-review-macos.zip \
               rugby-referee-review-linux/rugby-referee-review-linux.tar.gz
           fi
